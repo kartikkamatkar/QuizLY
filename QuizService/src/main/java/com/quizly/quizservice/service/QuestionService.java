@@ -7,6 +7,8 @@ import com.quizly.quizservice.enums.Category;
 import com.quizly.quizservice.enums.Difficulty;
 import com.quizly.quizservice.mapper.QuestionMapper;
 import com.quizly.quizservice.repository.QuestionRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,12 +37,13 @@ public class QuestionService {
         return questionMapper.toResponse(savedQuestion);
     }
 
-    public List<QuestionResponse> getAllQuestions() {
+    public Page<QuestionResponse> getAllQuestions(
+            int page,
+            int size) {
 
-        return questionRepository.findAll()
-                .stream()
-                .map(questionMapper::toResponse)
-                .collect(Collectors.toList());
+        return questionRepository
+                .findAll(PageRequest.of(page, size))
+                .map(questionMapper::toResponse);
     }
 
     public QuestionResponse getQuestionById(Long id) {
@@ -101,5 +104,14 @@ public class QuestionService {
                         new RuntimeException("Question not found"));
 
         questionRepository.delete(question);
+    }
+    public List<QuestionResponse> getQuestionsByQuizId(
+            Long quizId) {
+
+        return questionRepository
+                .findByQuizId(quizId)
+                .stream()
+                .map(questionMapper::toResponse)
+                .toList();
     }
 }
