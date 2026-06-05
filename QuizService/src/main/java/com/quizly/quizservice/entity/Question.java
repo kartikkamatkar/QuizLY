@@ -4,7 +4,8 @@ import com.quizly.quizservice.enums.Category;
 import com.quizly.quizservice.enums.Difficulty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
 @Entity
 @Table(name ="questions")
 public class Question
@@ -12,6 +13,34 @@ public class Question
 @GeneratedValue(strategy = GenerationType.IDENTITY)
 @Id
     private long id;
+
+    @ManyToOne
+    @JoinColumn(name = "quiz_id")
+    private Quiz quiz;
+
+    public Quiz getQuiz() {
+        return quiz;
+    }
+
+    public void setQuiz(Quiz quiz) {
+        this.quiz = quiz;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public Difficulty getDifficulty() {
+        return difficulty;
+    }
+
+    public void setDifficulty(Difficulty difficulty) {
+        this.difficulty = difficulty;
+    }
 
     @NotBlank
     private String question;

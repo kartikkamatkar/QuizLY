@@ -1,5 +1,6 @@
 package com.quizly.quizservice.controller;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import com.quizly.quizservice.dto.QuestionRequest;
 import com.quizly.quizservice.dto.QuestionResponse;
 import com.quizly.quizservice.enums.Category;
@@ -20,6 +21,13 @@ public class QuestionController {
         this.questionService = questionService;
     }
 
+    @GetMapping("/quiz/{quizId}")
+    public List<QuestionResponse> getQuestionsByQuizId(
+            @PathVariable Long quizId) {
+
+        return questionService
+                .getQuestionsByQuizId(quizId);
+    }
     @PostMapping
     public QuestionResponse addQuestion(
             @Valid @RequestBody QuestionRequest request) {
@@ -27,8 +35,12 @@ public class QuestionController {
     }
 
     @GetMapping
-    public List<QuestionResponse> getAllQuestions() {
-        return questionService.getAllQuestions();
+    public Page<QuestionResponse> getAllQuestions(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        return questionService
+                .getAllQuestions(page, size);
     }
 
     @GetMapping("/{id}")

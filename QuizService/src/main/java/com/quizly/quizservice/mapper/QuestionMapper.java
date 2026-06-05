@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 public class QuestionMapper {
 
     public Question toEntity(QuestionRequest request) {
+
         Question question = new Question();
 
         question.setQuestion(request.getQuestion());
@@ -19,10 +20,14 @@ public class QuestionMapper {
         question.setCorrectAnswer(request.getCorrectAnswer());
         question.setTopic(request.getTopic());
 
+        question.setCategory(request.getCategory());
+        question.setDifficulty(request.getDifficulty());
+
         return question;
     }
 
     public QuestionResponse toResponse(Question question) {
+
         QuestionResponse response = new QuestionResponse();
 
         response.setId(question.getId());
@@ -31,7 +36,9 @@ public class QuestionMapper {
         response.setOptionB(question.getOptionB());
         response.setOptionC(question.getOptionC());
         response.setOptionD(question.getOptionD());
-
+        response.setTopic(question.getTopic());
+       response.setCategory(question.getCategory());
+       response.setDifficulty(question.getDifficulty());
         return response;
     }
 }
