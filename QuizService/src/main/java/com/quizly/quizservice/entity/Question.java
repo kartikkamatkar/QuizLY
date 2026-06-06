@@ -1,5 +1,5 @@
 package com.quizly.quizservice.entity;
-
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.quizly.quizservice.enums.Category;
 import com.quizly.quizservice.enums.Difficulty;
 import jakarta.persistence.*;
@@ -14,9 +14,12 @@ public class Question
 @Id
     private long id;
 
+
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "quiz_id")
     private Quiz quiz;
+
 
     public Quiz getQuiz() {
         return quiz;

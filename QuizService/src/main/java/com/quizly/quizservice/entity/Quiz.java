@@ -3,71 +3,90 @@ package com.quizly.quizservice.entity;
 import com.quizly.quizservice.enums.Category;
 import com.quizly.quizservice.enums.Difficulty;
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table (name ="quizzes")
+@Table(name = "quizzes")
 public class Quiz {
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private Long id;
 
-        private String title;
+    @JsonManagedReference
+    @OneToMany(
+            mappedBy = "quiz",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY
+    )
+    private List<Question> questions = new ArrayList<>();
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-        private String description;
+    private String title;
 
-        @Enumerated(EnumType.STRING)
-        private Category category;
+    private String description;
 
-        @Enumerated(EnumType.STRING)
-        private Difficulty difficulty;
+    @Enumerated(EnumType.STRING)
+    private Category category;
 
-        private Integer timeLimit;
+    @Enumerated(EnumType.STRING)
+    private Difficulty difficulty;
 
-        public Long getId() {
-            return id;
-        }
+    private Integer timeLimit;
 
-        public void setId(Long id) {
-            this.id = id;
-        }
+    public Long getId() {
+        return id;
+    }
 
-        public String getTitle() {
-            return title;
-        }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-        public void setTitle(String title) {
-            this.title = title;
-        }
+    public String getTitle() {
+        return title;
+    }
 
-        public String getDescription() {
-            return description;
-        }
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-        public void setDescription(String description) {
-            this.description = description;
-        }
+    public String getDescription() {
+        return description;
+    }
 
-        public Category getCategory() {
-            return category;
-        }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-        public void setCategory(Category category) {
-            this.category = category;
-        }
+    public Category getCategory() {
+        return category;
+    }
 
-        public Difficulty getDifficulty() {
-            return difficulty;
-        }
+    public void setCategory(Category category) {
+        this.category = category;
+    }
 
-        public void setDifficulty(Difficulty difficulty) {
-            this.difficulty = difficulty;
-        }
+    public Difficulty getDifficulty() {
+        return difficulty;
+    }
 
-        public Integer getTimeLimit() {
-            return timeLimit;
-        }
+    public void setDifficulty(Difficulty difficulty) {
+        this.difficulty = difficulty;
+    }
 
-        public void setTimeLimit(Integer timeLimit) {
-            this.timeLimit = timeLimit;
-        }
+    public Integer getTimeLimit() {
+        return timeLimit;
+    }
+
+    public void setTimeLimit(Integer timeLimit) {
+        this.timeLimit = timeLimit;
+    }
+
+    public List<Question> getQuestions() {
+        return questions;
+    }
+
+    public void setQuestions(List<Question> questions) {
+        this.questions = questions;
+    }
 }
