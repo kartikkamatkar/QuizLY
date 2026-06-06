@@ -3,11 +3,9 @@ package com.quizly.quizservice.dto;
 import java.util.Map;
 
 public class SubmitQuizRequest {
-
     private Long userId;
     private Long quizId;
-
-    private Map<Long, String> answers;
+    private Map<Long, String> answers;  // questionId -> userAnswer
 
     public Long getUserId() {
         return userId;

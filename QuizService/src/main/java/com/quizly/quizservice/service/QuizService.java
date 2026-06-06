@@ -11,6 +11,7 @@ import com.quizly.quizservice.repository.QuizRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,16 +22,20 @@ public class QuizService {
     private final QuizMapper quizMapper;
     private final QuestionRepository questionRepository;
     private final QuizRepository quizRepository;
+    private final RestTemplate restTemplate;
 
     public QuizService(
             QuizRepository quizRepository,
             QuizMapper quizMapper,
-            QuestionRepository questionRepository) {
+            QuestionRepository questionRepository,
+            RestTemplate restTemplate) {
 
         this.quizRepository = quizRepository;
         this.quizMapper = quizMapper;
         this.questionRepository = questionRepository;
+        this.restTemplate = restTemplate;
     }
+
     // Quiz methods
     public QuizResponse createQuiz(QuizRequest request) {
         Quiz quiz = quizMapper.toEntity(request);
@@ -51,21 +56,17 @@ public class QuizService {
         Quiz quiz = quizRepository.findById(id).orElseThrow(() -> new RuntimeException("Quiz not found"));
         quizRepository.delete(quiz);
     }
+
     public StartQuizResponse startQuiz(Long quizId) {
-
         Quiz quiz = quizRepository.findById(quizId)
-                .orElseThrow(() ->
-                        new RuntimeException("Quiz not found"));
+                .orElseThrow(() -> new RuntimeException("Quiz not found"));
 
-        List<QuestionResponse> questions =
-                questionRepository.findByQuizId(quizId)
-                        .stream()
-                        .map(quizMapper::toResponse)
-                        .toList();
+        List<QuestionResponse> questions = questionRepository.findByQuizId(quizId)
+                .stream()
+                .map(quizMapper::toResponse)
+                .toList();
 
-        StartQuizResponse response =
-                new StartQuizResponse();
-
+        StartQuizResponse response = new StartQuizResponse();
         response.setQuizId(quiz.getId());
         response.setTitle(quiz.getTitle());
         response.setQuestions(questions);
@@ -120,68 +121,87 @@ public class QuizService {
         Question question = questionRepository.findById(id).orElseThrow(() -> new RuntimeException("Question not found"));
         questionRepository.delete(question);
     }
-    public void addQuestionToQuiz(
-            Long quizId,
-            Long questionId) {
 
+    public void addQuestionToQuiz(Long quizId, Long questionId) {
         Quiz quiz = quizRepository.findById(quizId)
-                .orElseThrow(() ->
-                        new RuntimeException("Quiz not found"));
+                .orElseThrow(() -> new RuntimeException("Quiz not found"));
 
         Question question = questionRepository.findById(questionId)
-                .orElseThrow(() ->
-                        new RuntimeException("Question not found"));
+                .orElseThrow(() -> new RuntimeException("Question not found"));
 
         question.setQuiz(quiz);
-
         questionRepository.save(question);
     }
-    public List<QuestionResponse> getQuizQuestions(
-            Long quizId) {
 
-        return questionRepository
-                .findByQuizId(quizId)
+    public List<QuestionResponse> getQuizQuestions(Long quizId) {
+        return questionRepository.findByQuizId(quizId)
                 .stream()
                 .map(quizMapper::toResponse)
                 .toList();
     }
-    public SubmitQuizResponse submitQuiz(
-            SubmitQuizRequest request) {
 
-        List<Question> questions =
-                questionRepository.findByQuizId(
-                        request.getQuizId());
+    // CORRECTED submitQuiz method
+    public SubmitQuizResponse submitQuiz(SubmitQuizRequest request) {
+        // First, get all questions for this quiz
+        List<Question> questions = questionRepository.findByQuizId(request.getQuizId());
 
+        if (questions.isEmpty()) {
+            throw new RuntimeException("No questions found for this quiz");
+        }
+
+        // Calculate score
         int score = 0;
-
         for (Question question : questions) {
+            String userAnswer = request.getAnswers().get(question.getId());
 
-            String userAnswer =
-                    request.getAnswers()
-                            .get(question.getId());
-
-            if (userAnswer != null &&
-                    userAnswer.equalsIgnoreCase(
-                            question.getCorrectAnswer())) {
-
+            if (userAnswer != null && userAnswer.equalsIgnoreCase(question.getCorrectAnswer())) {
                 score++;
             }
         }
 
-        SubmitQuizResponse response =
-                new SubmitQuizResponse();
+        // Create attempt request (to send to attempt service)
+        AttemptRequest attempt = new AttemptRequest();
+        attempt.setUserId(request.getUserId());
+        attempt.setQuizId(request.getQuizId());
+        attempt.setScore(score);
+        attempt.setTotalQuestions(questions.size());
 
+        try {
+
+            System.out.println("=== BEFORE CALL ===");
+
+            Object response = restTemplate.postForObject(
+                    "http://localhost:6061/api/attempts",
+                    attempt,
+                    Object.class
+            );
+
+            System.out.println("=== AFTER CALL ===");
+            System.out.println(response);
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+
+        SubmitQuizResponse response = new SubmitQuizResponse();
         response.setScore(score);
-        response.setTotalQuestions(
-                questions.size());
+        response.setTotalQuestions(questions.size());
 
-        double percentage =
-                ((double) score /
-                        questions.size()) * 100;
-
+        double percentage = ((double) score / questions.size()) * 100;
         response.setPercentage(percentage);
+
+        // Optional: Add feedback
+        if (percentage >= 80) {
+            response.setFeedback("Excellent! Great job!");
+        } else if (percentage >= 60) {
+            response.setFeedback("Good work! Keep practicing!");
+        } else if (percentage >= 40) {
+            response.setFeedback("Fair attempt. Review the material and try again.");
+        } else {
+            response.setFeedback("Need more practice. Don't give up!");
+        }
 
         return response;
     }
-
 }
