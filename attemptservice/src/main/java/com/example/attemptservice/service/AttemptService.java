@@ -1,5 +1,6 @@
 package com.example.attemptservice.service;
-
+import com.example.attemptservice.dto.DashboardResponse;
+import com.example.attemptservice.dto.LeaderboardResponse;
 import com.example.attemptservice.dto.AttemptRequest;
 import com.example.attemptservice.dto.AttemptResponse;
 import com.example.attemptservice.entity.QuizAttempt;
@@ -83,6 +84,52 @@ public class AttemptService {
                 attempt.getTotalQuestions());
         response.setSubmittedAt(
                 attempt.getSubmittedAt());
+
+        return response;
+    }
+    public List<LeaderboardResponse> getLeaderboard() {
+
+        return attemptRepository.getLeaderboard()
+                .stream()
+                .map(result -> {
+
+                    LeaderboardResponse response =
+                            new LeaderboardResponse();
+
+                    response.setUserId(
+                            ((Number) result[0]).longValue()
+                    );
+
+                    response.setTotalScore(
+                            ((Number) result[1]).longValue()
+                    );
+
+                    return response;
+                })
+                .toList();
+    }
+    public DashboardResponse getDashboard(Long userId) {
+
+        List<QuizAttempt> attempts =
+                attemptRepository.findByUserId(userId);
+
+        DashboardResponse response =
+                new DashboardResponse();
+
+        response.setTotalAttempts(
+                (long) attempts.size());
+
+        response.setHighestScore(
+                attempts.stream()
+                        .mapToInt(QuizAttempt::getScore)
+                        .max()
+                        .orElse(0));
+
+        response.setAverageScore(
+                attempts.stream()
+                        .mapToInt(QuizAttempt::getScore)
+                        .average()
+                        .orElse(0));
 
         return response;
     }

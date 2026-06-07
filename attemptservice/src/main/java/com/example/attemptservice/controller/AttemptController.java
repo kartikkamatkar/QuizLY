@@ -2,6 +2,7 @@ package com.example.attemptservice.controller;
 
 import com.example.attemptservice.dto.AttemptRequest;
 import com.example.attemptservice.dto.AttemptResponse;
+import com.example.attemptservice.dto.LeaderboardResponse;
 import com.example.attemptservice.service.AttemptService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +35,7 @@ public class AttemptController {
         return attemptService.getAttemptById(id);
     }
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("dashboard/user/{userId}")
     public List<AttemptResponse> getAttemptsByUserId(
             @PathVariable Long userId) {
 
@@ -54,5 +55,10 @@ public class AttemptController {
         attemptService.deleteAttempt(id);
 
         return "Attempt Deleted Successfully";
+    }
+    @GetMapping("/leaderboard")
+    public List<LeaderboardResponse> getLeaderboard() {
+
+        return attemptService.getLeaderboard();
     }
 }
