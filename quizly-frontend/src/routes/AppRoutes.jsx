@@ -10,6 +10,8 @@ import QuizDetailed from '../pages/QuizDetailed';
 import QuizTaking from '../pages/QuizTaking';
 import Result from '../pages/Result';
 import Leaderboard from '../pages/Leaderboard';
+import Competitions from '../pages/Competitions';
+import Lobby from '../pages/Lobby';
 
 const AppRoutes = () => {
   return (
@@ -64,6 +66,22 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute>
               <Leaderboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/competitions"
+          element={
+            <ProtectedRoute>
+              <Competitions />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/lobby/:roomCode"
+          element={
+            <ProtectedRoute>
+              <Lobby />
             </ProtectedRoute>
           }
         />

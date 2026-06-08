@@ -13,7 +13,7 @@ const QuizList = () => {
   const [categoryFilter, setCategoryFilter] = useState('ALL');
   const [difficultyFilter, setDifficultyFilter] = useState('ALL');
   
-  const categories = ['ALL', 'JAVA', 'SPRING', 'REACT', 'DSA', 'DBMS', 'OS', 'CN'];
+  const categories = ['ALL', 'JAVA', 'SPRING', 'REACT', 'DSA', 'DBMS', 'OS', 'CN', 'APTITUDE'];
   const difficulties = ['ALL', 'EASY', 'MEDIUM', 'HARD'];
 
   useEffect(() => {

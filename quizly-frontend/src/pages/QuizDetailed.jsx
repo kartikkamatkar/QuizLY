@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiClock, FiPlay, FiAlertCircle, FiAward, FiBookOpen, FiArrowLeft } from 'react-icons/fi';
+import { FiClock, FiPlay, FiAlertCircle, FiAward, FiBookOpen, FiArrowLeft, FiDownload } from 'react-icons/fi';
 import api from '../api/axios';
 
 const QuizDetailed = () => {
@@ -153,20 +153,34 @@ const QuizDetailed = () => {
           </div>
 
           {/* Start Action Trigger */}
-          <button
-            onClick={handleStartQuiz}
-            disabled={starting}
-            className="w-full py-4 bg-white text-black hover:bg-black hover:text-white hover:border-white border border-white rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-          >
-            {starting ? (
-              <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <>
-                <FiPlay size={18} />
-                <span>INITIATE TEST SEQUENCE</span>
-              </>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <button
+              onClick={handleStartQuiz}
+              disabled={starting}
+              className="flex-1 py-4 bg-white text-black hover:bg-black hover:text-white hover:border-white border border-white rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            >
+              {starting ? (
+                <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <>
+                  <FiPlay size={18} />
+                  <span>INITIATE TEST SEQUENCE</span>
+                </>
+              )}
+            </button>
+
+            {quiz.pdfUrl && (
+              <a
+                href={quiz.pdfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="py-4 px-6 bg-black text-white hover:bg-white hover:text-black border border-mono-gray-700 hover:border-white rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <FiDownload size={18} />
+                <span>DOWNLOAD PDF SHEET</span>
+              </a>
             )}
-          </button>
+          </div>
         </motion.div>
       </div>
     </div>

@@ -7,5 +7,6 @@ public enum Category {
     DSA,
     DBMS,
     OS,
-    CN
+    CN,
+    APTITUDE
 }

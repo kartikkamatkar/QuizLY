@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiMenu, FiX, FiLogOut, FiGrid, FiList, FiAward, FiShield, FiUser } from 'react-icons/fi';
+import { FiMenu, FiX, FiLogOut, FiGrid, FiList, FiAward, FiShield, FiUser, FiZap } from 'react-icons/fi';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -37,6 +37,7 @@ const Navbar = () => {
   const protectedLinks = [
     { name: 'Dashboard', path: '/dashboard', icon: FiGrid },
     { name: 'Quizzes', path: '/quizzes', icon: FiList },
+    { name: 'Arena', path: '/competitions', icon: FiZap },
     { name: 'Leaderboard', path: '/leaderboard', icon: FiAward },
   ];
 

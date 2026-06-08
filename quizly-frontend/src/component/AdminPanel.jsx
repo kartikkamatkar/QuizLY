@@ -21,6 +21,7 @@ const AdminPanel = () => {
   const [quizCategory, setQuizCategory] = useState('JAVA');
   const [quizDifficulty, setQuizDifficulty] = useState('EASY');
   const [quizTimeLimit, setQuizTimeLimit] = useState(30);
+  const [quizPdfUrl, setQuizPdfUrl] = useState('');
 
   // Form States - Question Creation
   const [questText, setQuestText] = useState('');
@@ -37,7 +38,7 @@ const AdminPanel = () => {
   const [selectedQuizId, setSelectedQuizId] = useState('');
   const [selectedQuestionId, setSelectedQuestionId] = useState('');
 
-  const categories = ['JAVA', 'SPRING', 'REACT', 'DSA', 'DBMS', 'OS', 'CN'];
+  const categories = ['JAVA', 'SPRING', 'REACT', 'DSA', 'DBMS', 'OS', 'CN', 'APTITUDE'];
   const difficulties = ['EASY', 'MEDIUM', 'HARD'];
 
   useEffect(() => {
@@ -85,13 +86,15 @@ const AdminPanel = () => {
         description: quizDescription,
         category: quizCategory,
         difficulty: quizDifficulty,
-        timeLimit: parseInt(quizTimeLimit)
+        timeLimit: parseInt(quizTimeLimit),
+        pdfUrl: quizPdfUrl
       });
 
       setSuccess('Quiz created successfully!');
       setQuizTitle('');
       setQuizDescription('');
       setQuizTimeLimit(30);
+      setQuizPdfUrl('');
       fetchQuizzes();
     } catch (err) {
       setError(err.response?.data || 'Failed to create quiz.');
@@ -326,6 +329,17 @@ const AdminPanel = () => {
                     required
                   />
                 </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-mono-gray-400">Practice Sheet PDF URL (Optional)</label>
+                <input
+                  type="url"
+                  placeholder="https://example.com/practice.pdf"
+                  className="mono-input"
+                  value={quizPdfUrl}
+                  onChange={(e) => setQuizPdfUrl(e.target.value)}
+                />
               </div>
 
               <button

@@ -24,6 +24,7 @@ public class QuizMapper {
         quiz.setCategory(request.getCategory());
         quiz.setDifficulty(request.getDifficulty());
         quiz.setTimeLimit(request.getTimeLimit());
+        quiz.setPdfUrl(request.getPdfUrl());
 
         return quiz;
     }
@@ -38,6 +39,7 @@ public class QuizMapper {
         response.setCategory(quiz.getCategory());
         response.setDifficulty(quiz.getDifficulty());
         response.setTimeLimit(quiz.getTimeLimit());
+        response.setPdfUrl(quiz.getPdfUrl());
 
         return response;
     }
