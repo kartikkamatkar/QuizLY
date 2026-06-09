@@ -1,0 +1,102 @@
+name: QuizLY CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    name: Build & Run Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          - config-server
+          - eureka-server
+          - api-gateway
+          - auth-service
+          - QuizService
+          - attemptservice
+          - competition-service
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build and Test Service
+        run: |
+          cd ${{ matrix.service }}
+          # Check if there is a maven wrapper, else use standard mvn
+          if [ -f "./mvnw" ]; then
+            chmod +x ./mvnw
+            ./mvnw clean test
+          else
+            mvn clean test
+          fi
+
+  publish-docker-images:
+    name: Build & Publish Docker Images
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    strategy:
+      matrix:
+        service:
+          - config-server
+          - eureka-server
+          - api-gateway
+          - auth-service
+          - QuizService
+          - attemptservice
+          - competition-service
+        include:
+          - service: config-server
+            image_name: quizly-config-server
+          - service: eureka-server
+            image_name: quizly-eureka-server
+          - service: api-gateway
+            image_name: quizly-api-gateway
+          - service: auth-service
+            image_name: quizly-auth-service
+          - service: QuizService
+            image_name: quizly-quiz-service
+          - service: attemptservice
+            image_name: quizly-attempt-service
+          - service: competition-service
+            image_name: quizly-competition-service
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./${{ matrix.service }}
+          file: ./${{ matrix.service }}/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.image_name }}:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.image_name }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

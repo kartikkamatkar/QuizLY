@@ -50,7 +50,7 @@ public class LoginService
         if(isMatch)
         {
             // Successful password match: return JWT token for the client
-            return jwtUtil.generateToken(dbuser.get().getEmail());
+            return jwtUtil.generateToken(dbuser.get().getEmail(), dbuser.get().getRole().name(), dbuser.get().getId());
         }
 
         return  "Invalid Credentials";

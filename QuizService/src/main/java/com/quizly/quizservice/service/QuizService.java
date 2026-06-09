@@ -11,7 +11,7 @@ import com.quizly.quizservice.repository.QuizRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import com.quizly.quizservice.client.AttemptClient;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,18 +22,18 @@ public class QuizService {
     private final QuizMapper quizMapper;
     private final QuestionRepository questionRepository;
     private final QuizRepository quizRepository;
-    private final RestTemplate restTemplate;
+    private final AttemptClient attemptClient;
 
     public QuizService(
             QuizRepository quizRepository,
             QuizMapper quizMapper,
             QuestionRepository questionRepository,
-            RestTemplate restTemplate) {
+            AttemptClient attemptClient) {
 
         this.quizRepository = quizRepository;
         this.quizMapper = quizMapper;
         this.questionRepository = questionRepository;
-        this.restTemplate = restTemplate;
+        this.attemptClient = attemptClient;
     }
 
     // Quiz methods
@@ -170,11 +170,7 @@ public class QuizService {
 
             System.out.println("=== BEFORE CALL ===");
 
-            Object response = restTemplate.postForObject(
-                    "http://localhost:6061/api/attempts",
-                    attempt,
-                    Object.class
-            );
+            Object response = attemptClient.saveAttempt(attempt);
 
             System.out.println("=== AFTER CALL ===");
             System.out.println(response);

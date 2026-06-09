@@ -65,11 +65,11 @@ public class AuthController {
             return "User Data Expired";
         }
 
-        repo.save(user);
+        User savedUser = repo.save(user);
 
         redisService.deleteUser(request.getEmail());
 
-        return jwtUtil.generateToken(user.getEmail());
+        return jwtUtil.generateToken(savedUser.getEmail(), savedUser.getRole().name(), savedUser.getId());
     }
 
     @PostMapping("/forgetpass")

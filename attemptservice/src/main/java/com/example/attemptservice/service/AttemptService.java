@@ -15,9 +15,15 @@ import java.util.stream.Collectors;
 public class AttemptService {
 
     private final QuizAttemptRepository attemptRepository;
+    private final LeaderboardCacheService leaderboardCacheService;
+    private final org.springframework.kafka.core.KafkaTemplate<String, Object> kafkaTemplate;
 
-    public AttemptService(QuizAttemptRepository attemptRepository) {
+    public AttemptService(QuizAttemptRepository attemptRepository, 
+                          LeaderboardCacheService leaderboardCacheService,
+                          org.springframework.kafka.core.KafkaTemplate<String, Object> kafkaTemplate) {
         this.attemptRepository = attemptRepository;
+        this.leaderboardCacheService = leaderboardCacheService;
+        this.kafkaTemplate = kafkaTemplate;
     }
 
     public AttemptResponse saveAttempt(AttemptRequest request) {
@@ -33,7 +39,23 @@ public class AttemptService {
         QuizAttempt savedAttempt =
                 attemptRepository.save(attempt);
 
-        return mapToResponse(savedAttempt);
+        // Update Redis real-time leaderboard cache
+        try {
+            leaderboardCacheService.updateScore(savedAttempt.getUserId(), (long) savedAttempt.getScore());
+        } catch (Exception e) {
+            System.err.println("Could not update leaderboard cache: " + e.getMessage());
+        }
+
+        AttemptResponse response = mapToResponse(savedAttempt);
+
+        // Publish to Kafka topic 'quiz-attempted'
+        try {
+            kafkaTemplate.send("quiz-attempted", response.getUserId().toString(), response);
+        } catch (Exception e) {
+            System.err.println("Could not publish quiz-attempted event: " + e.getMessage());
+        }
+
+        return response;
     }
 
     public AttemptResponse getAttemptById(Long id) {
@@ -88,25 +110,36 @@ public class AttemptService {
         return response;
     }
     public List<LeaderboardResponse> getLeaderboard() {
+        // Try fetching from Redis Cache first
+        try {
+            if (leaderboardCacheService.hasLeaderboard()) {
+                return leaderboardCacheService.getTopLeaderboard(10);
+            }
+        } catch (Exception e) {
+            System.err.println("Leaderboard cache lookup failed, falling back to DB: " + e.getMessage());
+        }
 
-        return attemptRepository.getLeaderboard()
+        // Database fallback & cache priming
+        List<LeaderboardResponse> dbLeaderboard = attemptRepository.getLeaderboard()
                 .stream()
                 .map(result -> {
-
-                    LeaderboardResponse response =
-                            new LeaderboardResponse();
-
-                    response.setUserId(
-                            ((Number) result[0]).longValue()
-                    );
-
-                    response.setTotalScore(
-                            ((Number) result[1]).longValue()
-                    );
-
+                    LeaderboardResponse response = new LeaderboardResponse();
+                    response.setUserId(((Number) result[0]).longValue());
+                    response.setTotalScore(((Number) result[1]).longValue());
                     return response;
                 })
                 .toList();
+
+        // Populate cache safely
+        try {
+            for (LeaderboardResponse entry : dbLeaderboard) {
+                leaderboardCacheService.updateScore(entry.getUserId(), entry.getTotalScore());
+            }
+        } catch (Exception e) {
+            System.err.println("Could not prime leaderboard cache: " + e.getMessage());
+        }
+
+        return dbLeaderboard;
     }
     public DashboardResponse getDashboard(Long userId) {
 

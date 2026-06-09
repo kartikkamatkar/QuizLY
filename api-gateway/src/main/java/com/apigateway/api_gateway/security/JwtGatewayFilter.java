@@ -56,6 +56,24 @@ public class JwtGatewayFilter implements GlobalFilter {
             return response.setComplete();
         }
 
-        return chain.filter(exchange);
+        try {
+            io.jsonwebtoken.Claims claims = jwtUtil.getClaims(token);
+            String email = claims.getSubject();
+            String role = (String) claims.get("role");
+            String userId = (String) claims.get("userId");
+
+            ServerWebExchange mutatedExchange = exchange.mutate()
+                    .request(builder -> builder
+                            .header("X-User-Email", email != null ? email : "")
+                            .header("X-User-Role", role != null ? role : "")
+                            .header("X-User-Id", userId != null ? userId : ""))
+                    .build();
+
+            return chain.filter(mutatedExchange);
+        } catch (Exception e) {
+            ServerHttpResponse response = exchange.getResponse();
+            response.setStatusCode(HttpStatus.UNAUTHORIZED);
+            return response.setComplete();
+        }
     }
 }

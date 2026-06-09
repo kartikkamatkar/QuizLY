@@ -1,0 +1,253 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-server-files
+data:
+  application.yml: |
+    eureka:
+      client:
+        service-url:
+          defaultZone: http://eureka-server:8761/eureka/
+        register-with-eureka: true
+        fetch-registry: true
+      instance:
+        prefer-ip-address: true
+
+    management:
+      endpoints:
+        web:
+          exposure:
+            include: "*"
+      endpoint:
+        health:
+          show-details: always
+      tracing:
+        sampling:
+          probability: 1.0
+      zipkin:
+        tracing:
+          endpoint: http://zipkin:9411/api/v2/spans
+
+    resilience4j:
+      circuitbreaker:
+        configs:
+          default:
+            registerHealthIndicator: true
+            slidingWindowSize: 10
+            minimumNumberOfCalls: 5
+            failureRateThreshold: 50.0
+            waitDurationInOpenState: 10s
+            permittedNumberOfCallsInHalfOpenState: 3
+            automaticTransitionFromOpenToHalfOpenEnabled: true
+      retry:
+        configs:
+          default:
+            maxAttempts: 3
+            waitDuration: 2s
+            enableExponentialBackoff: true
+            exponentialBackoffMultiplier: 2
+      ratelimiter:
+        configs:
+          default:
+            limitForPeriod: 50
+            limitRefreshPeriod: 1s
+            timeoutDuration: 500ms
+      bulkhead:
+        configs:
+          default:
+            maxConcurrentCalls: 10
+            maxWaitDuration: 10ms
+
+  api-gateway.yml: |
+    server:
+      port: 6063
+    spring:
+      cloud:
+        gateway:
+          routes:
+            - id: auth-service
+              uri: lb://auth-service
+              predicates:
+                - Path=/auth/**
+            - id: quiz-service-questions
+              uri: lb://quiz-service
+              predicates:
+                - Path=/api/questions/**
+            - id: quiz-service-quizzes
+              uri: lb://quiz-service
+              predicates:
+                - Path=/api/quizzes/**
+            - id: attempt-service
+              uri: lb://attempt-service
+              predicates:
+                - Path=/api/attempts/**
+            - id: competition-service
+              uri: lb://competition-service
+              predicates:
+                - Path=/api/competitions/**
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowedOriginPatterns: "*"
+                allowedMethods: [GET, POST, PUT, DELETE, OPTIONS]
+                allowedHeaders: "*"
+                allowCredentials: true
+    jwt:
+      secret: mydevsecretmydevsecretmydevsecret1234567890
+
+  auth-service.yml: |
+    server:
+      port: 9090
+    spring:
+      datasource:
+        url: jdbc:postgresql://postgres:5432/auth_core
+        username: postgres
+        password: postgresql
+        driver-class-name: org.postgresql.Driver
+      jpa:
+        hibernate:
+          ddl-auto: update
+        show-sql: true
+      data:
+        redis:
+          host: redis
+          port: 6379
+      mail:
+        host: smtp.gmail.com
+        port: 587
+        username: kartikkamatkar98@gmail.com
+        password: krthbyifxuparwlo
+        properties:
+          mail:
+            smtp:
+              auth: true
+              starttls:
+                enable: true
+    jwt:
+      secret: mydevsecretmydevsecretmydevsecret1234567890
+
+  quiz-service.yml: |
+    server:
+      port: 6060
+    spring:
+      datasource:
+        url: jdbc:postgresql://postgres:5432/quizly
+        username: postgres
+        password: postgresql
+      jpa:
+        hibernate:
+          ddl-auto: update
+        show-sql: true
+
+  attempt-service.yml: |
+    server:
+      port: 6061
+    spring:
+      datasource:
+        url: jdbc:postgresql://postgres:5432/quizly
+        username: postgres
+        password: postgresql
+      jpa:
+        hibernate:
+          ddl-auto: update
+        show-sql: true
+      data:
+        redis:
+          host: redis
+          port: 6379
+
+  competition-service.yml: |
+    server:
+      port: 6062
+    spring:
+      datasource:
+        url: jdbc:postgresql://postgres:5432/quizly
+        username: postgres
+        password: postgresql
+      jpa:
+        hibernate:
+          ddl-auto: update
+        show-sql: true
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: config-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: config-server
+  template:
+    metadata:
+      labels:
+        app: config-server
+    spec:
+      containers:
+        - name: config-server
+          image: com.quizly/config-server:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8888
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: native
+            - name: SPRING_CLOUD_CONFIG_SERVER_NATIVE_SEARCH_LOCATIONS
+              value: file:/app/config-repo
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/config-repo
+      volumes:
+        - name: config-volume
+          configMap:
+            name: config-server-files
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: config-server
+spec:
+  ports:
+    - port: 8888
+  selector:
+    app: config-server
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eureka-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eureka-server
+  template:
+    metadata:
+      labels:
+        app: eureka-server
+    spec:
+      containers:
+        - name: eureka-server
+          image: com.quizly/eureka-server:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8761
+          env:
+            - name: SPRING_CONFIG_IMPORT
+              value: "optional:configserver:http://config-server:8888"
+            - name: EUREKA_INSTANCE_HOSTNAME
+              value: "eureka-server"
+      initContainers:
+        - name: wait-for-config-server
+          image: busybox:1.36
+          command: ['sh', '-c', 'until nc -z config-server 8888; do echo waiting for config-server; sleep 2; done;']
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eureka-server
+spec:
+  ports:
+    - port: 8761
+  selector:
+    app: eureka-server

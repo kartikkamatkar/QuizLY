@@ -1,0 +1,39 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: 'api-gateway'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['api-gateway:6063']
+
+  - job_name: 'auth-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['auth-service:9090']
+
+  - job_name: 'quiz-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['quiz-service:6060']
+
+  - job_name: 'attempt-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['attempt-service:6061']
+
+  - job_name: 'competition-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['competition-service:6062']
+
+  - job_name: 'eureka-server'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['eureka-server:8761']
+
+  - job_name: 'config-server'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['config-server:8888']

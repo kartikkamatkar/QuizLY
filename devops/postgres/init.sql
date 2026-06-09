@@ -1,0 +1,2 @@
+CREATE DATABASE auth_core;
+CREATE DATABASE quizly;
