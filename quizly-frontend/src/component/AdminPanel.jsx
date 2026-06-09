@@ -5,11 +5,11 @@ import api from '../api/axios';
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState('quizzes'); // 'quizzes', 'questions', 'assign'
-  
+
   // Data lists
   const [quizzes, setQuizzes] = useState([]);
   const [questions, setQuestions] = useState([]);
-  
+
   // Loading & Alert states
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -189,148 +189,152 @@ const AdminPanel = () => {
   };
 
   return (
-    <div className="w-full bg-mono-gray-900 border border-mono-gray-800 rounded-2xl p-6 sm:p-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 border-b border-mono-gray-800 pb-4">
-        <div>
-          <h2 className="text-2xl font-display font-bold text-white flex items-center gap-2">
-            <FiBookOpen className="text-white" /> Admin Control Board
-          </h2>
-          <p className="text-mono-gray-400 text-xs mt-1">Configure quizzes, questions, and curriculum.</p>
+      <div className="w-full bg-mono-gray-900 border border-mono-gray-800 rounded-2xl p-6 sm:p-8">
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8 pb-6 border-b border-mono-gray-800">
+          <div>
+            <h2 className="text-2xl font-display font-bold text-white flex items-center gap-3">
+              <FiBookOpen className="text-white" size={24} />
+              Admin Control Board
+            </h2>
+            <p className="text-mono-gray-400 text-sm mt-2">Configure quizzes, questions, and curriculum.</p>
+          </div>
+
+          {/* Tab Controls */}
+          <div className="flex bg-black p-1 border border-mono-gray-800 rounded-lg gap-1">
+            <button
+                onClick={() => { setActiveTab('quizzes'); setError(''); setSuccess(''); }}
+                className={`px-5 py-2 text-sm font-semibold rounded-md transition-all duration-200 cursor-pointer ${
+                    activeTab === 'quizzes' ? 'bg-white text-black' : 'text-mono-gray-400 hover:text-white hover:bg-mono-gray-800'
+                }`}
+            >
+              Quizzes
+            </button>
+            <button
+                onClick={() => { setActiveTab('questions'); setError(''); setSuccess(''); }}
+                className={`px-5 py-2 text-sm font-semibold rounded-md transition-all duration-200 cursor-pointer ${
+                    activeTab === 'questions' ? 'bg-white text-black' : 'text-mono-gray-400 hover:text-white hover:bg-mono-gray-800'
+                }`}
+            >
+              Questions
+            </button>
+            <button
+                onClick={() => { setActiveTab('assign'); setError(''); setSuccess(''); }}
+                className={`px-5 py-2 text-sm font-semibold rounded-md transition-all duration-200 cursor-pointer ${
+                    activeTab === 'assign' ? 'bg-white text-black' : 'text-mono-gray-400 hover:text-white hover:bg-mono-gray-800'
+                }`}
+            >
+              Link Items
+            </button>
+          </div>
         </div>
 
-        {/* Tab Controls */}
-        <div className="flex bg-black p-1 border border-mono-gray-800 rounded-lg">
-          <button
-            onClick={() => { setActiveTab('quizzes'); setError(''); setSuccess(''); }}
-            className={`px-4 py-1.5 text-xs font-semibold rounded-md transition-colors cursor-pointer ${
-              activeTab === 'quizzes' ? 'bg-white text-black' : 'text-mono-gray-400 hover:text-white'
-            }`}
-          >
-            Quizzes
-          </button>
-          <button
-            onClick={() => { setActiveTab('questions'); setError(''); setSuccess(''); }}
-            className={`px-4 py-1.5 text-xs font-semibold rounded-md transition-colors cursor-pointer ${
-              activeTab === 'questions' ? 'bg-white text-black' : 'text-mono-gray-400 hover:text-white'
-            }`}
-          >
-            Questions
-          </button>
-          <button
-            onClick={() => { setActiveTab('assign'); setError(''); setSuccess(''); }}
-            className={`px-4 py-1.5 text-xs font-semibold rounded-md transition-colors cursor-pointer ${
-              activeTab === 'assign' ? 'bg-white text-black' : 'text-mono-gray-400 hover:text-white'
-            }`}
-          >
-            Link Items
-          </button>
-        </div>
-      </div>
+        {/* Alerts */}
+        <AnimatePresence>
+          {error && (
+              <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="mb-8 p-4 bg-black border-l-4 border-white/40 border border-mono-gray-800 text-white rounded-lg flex items-center gap-3 text-sm"
+              >
+                <FiAlertTriangle className="text-white shrink-0" size={18} />
+                <span className="flex-1">{error}</span>
+              </motion.div>
+          )}
+          {success && (
+              <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="mb-8 p-4 bg-white text-black rounded-lg flex items-center gap-3 text-sm font-semibold"
+              >
+                <FiCheck className="shrink-0" size={18} />
+                <span className="flex-1">{success}</span>
+              </motion.div>
+          )}
+        </AnimatePresence>
 
-      {/* Alerts */}
-      <AnimatePresence>
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className="mb-6 p-4 bg-black border border-white/20 text-white rounded-lg flex items-center gap-3 text-sm"
-          >
-            <FiAlertTriangle className="text-white shrink-0" size={18} />
-            <span>{error}</span>
-          </motion.div>
-        )}
-        {success && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className="mb-6 p-4 bg-white text-black rounded-lg flex items-center gap-3 text-sm font-semibold"
-          >
-            <FiCheck className="shrink-0" size={18} />
-            <span>{success}</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
+        {/* Tab Panels */}
+        <div className="mt-2">
+          {/* TAB 1: QUIZZES */}
+          {activeTab === 'quizzes' && (
+              <div className="grid lg:grid-cols-5 gap-10">
+                {/* Create Quiz Form */}
+                <form onSubmit={handleCreateQuiz} className="lg:col-span-2 space-y-6">
+                  <div className="flex items-center gap-3 pb-2">
+                    <FiPlus size={20} className="text-white" />
+                    <h3 className="text-xl font-display font-semibold text-white">Create New Quiz</h3>
+                  </div>
 
-      {/* Tab Panels */}
-      <div>
-        {/* TAB 1: QUIZZES */}
-        {activeTab === 'quizzes' && (
-          <div className="grid lg:grid-cols-5 gap-8">
-            {/* Create Quiz Form */}
-            <form onSubmit={handleCreateQuiz} className="lg:col-span-2 space-y-4">
-              <h3 className="text-lg font-display font-semibold text-white flex items-center gap-2">
-                <FiPlus size={16} /> Create New Quiz
-              </h3>
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-mono-gray-400 block">Quiz Title</label>
+                    <input
+                        type="text"
+                        placeholder="Enter title (e.g. Spring Boot Basics)"
+                        className="mono-input w-full"
+                        value={quizTitle}
+                        onChange={(e) => setQuizTitle(e.target.value)}
+                        required
+                    />
+                  </div>
 
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-mono-gray-400">Quiz Title</label>
-                <input
-                  type="text"
-                  placeholder="Enter title (e.g. Spring Boot Basics)"
-                  className="mono-input"
-                  value={quizTitle}
-                  onChange={(e) => setQuizTitle(e.target.value)}
-                  required
-                />
-              </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-mono-gray-400 block">Description</label>
+                    <textarea
+                        placeholder="Enter short quiz description..."
+                        className="mono-input w-full min-h-[90px] resize-y"
+                        value={quizDescription}
+                        onChange={(e) => setQuizDescription(e.target.value)}
+                        required
+                    />
+                  </div>
 
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-mono-gray-400">Description</label>
-                <textarea
-                  placeholder="Enter short quiz description..."
-                  className="mono-input min-h-[80px]"
-                  value={quizDescription}
-                  onChange={(e) => setQuizDescription(e.target.value)}
-                  required
-                />
-              </div>
+                  <div className="grid grid-cols-2 gap-5">
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-mono-gray-400 block">Category</label>
+                      <select
+                          className="mono-input w-full bg-black"
+                          value={quizCategory}
+                          onChange={(e) => setQuizCategory(e.target.value)}
+                      >
+                        {categories.map((c) => (
+                            <option key={c} value={c}>{c}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-mono-gray-400 block">Difficulty</label>
+                      <select
+                          className="mono-input w-full bg-black"
+                          value={quizDifficulty}
+                          onChange={(e) => setQuizDifficulty(e.target.value)}
+                      >
+                        {difficulties.map((d) => (
+                            <option key={d} value={d}>{d}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-mono-gray-400">Category</label>
-                  <select
-                    className="mono-input bg-black"
-                    value={quizCategory}
-                    onChange={(e) => setQuizCategory(e.target.value)}
-                  >
-                    {categories.map((c) => (
-                      <option key={c} value={c}>{c}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-mono-gray-400">Difficulty</label>
-                  <select
-                    className="mono-input bg-black"
-                    value={quizDifficulty}
-                    onChange={(e) => setQuizDifficulty(e.target.value)}
-                  >
-                    {difficulties.map((d) => (
-                      <option key={d} value={d}>{d}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-mono-gray-400">Time Limit (Minutes)</label>
-                <div className="relative">
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-mono-gray-400 block">Time Limit (Minutes)</label>
+                    <div className="relative">
                   <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-mono-gray-500">
                     <FiClock size={16} />
                   </span>
-                  <input
-                    type="number"
-                    min="1"
-                    className="mono-input pl-9"
-                    value={quizTimeLimit}
-                    onChange={(e) => setQuizTimeLimit(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
+                      <input
+                          type="number"
+                          min="1"
+                          className="mono-input w-full pl-9"
+                          value={quizTimeLimit}
+                          onChange={(e) => setQuizTimeLimit(e.target.value)}
+                          required
+                      />
+                    </div>
+                  </div>
 
+<<<<<<< HEAD
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-mono-gray-400">Practice Sheet PDF URL (Optional)</label>
                 <input
@@ -354,301 +358,348 @@ const AdminPanel = () => {
                 )}
               </button>
             </form>
+=======
+                  <button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full py-3 bg-white text-black text-sm font-bold rounded-lg hover:bg-black hover:text-white hover:border-white border-2 border-white transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 mt-4"
+                  >
+                    {loading ? (
+                        <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                        <>Create Quiz</>
+                    )}
+                  </button>
+                </form>
+>>>>>>> 681ab92 (The Fronted added and integrated)
 
-            {/* List Quizzes */}
-            <div className="lg:col-span-3 space-y-4">
-              <h3 className="text-lg font-display font-semibold text-white">Active Quizzes ({quizzes.length})</h3>
-              
-              <div className="space-y-3 max-h-[450px] overflow-y-auto pr-2">
-                {quizzes.length > 0 ? (
-                  quizzes.map((q) => (
-                    <div
-                      key={q.id}
-                      className="p-4 bg-black border border-mono-gray-800 rounded-xl flex items-center justify-between hover:border-mono-gray-500 transition-colors"
-                    >
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-extrabold bg-white text-black px-1 rounded uppercase tracking-wide">
+                {/* List Quizzes */}
+                <div className="lg:col-span-3 space-y-5">
+                  <div className="flex items-center justify-between pb-2">
+                    <h3 className="text-xl font-display font-semibold text-white">Active Quizzes</h3>
+                    <span className="text-sm text-mono-gray-400 bg-black px-3 py-1 rounded-full border border-mono-gray-800">
+                  {quizzes.length} total
+                </span>
+                  </div>
+
+                  <div className="space-y-4 max-h-[550px] overflow-y-auto pr-2 custom-scrollbar">
+                    {quizzes.length > 0 ? (
+                        quizzes.map((q) => (
+                            <div
+                                key={q.id}
+                                className="p-5 bg-black border border-mono-gray-800 rounded-xl flex items-center justify-between hover:border-mono-gray-500 transition-all duration-200 group"
+                            >
+                              <div className="space-y-2 flex-1">
+                                <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-xs font-extrabold bg-white text-black px-2 py-0.5 rounded uppercase tracking-wide">
                             {q.category}
                           </span>
-                          <span className="text-[10px] text-mono-gray-400 border border-mono-gray-700 px-1 rounded uppercase">
+                                  <span className="text-xs text-mono-gray-400 border border-mono-gray-700 px-2 py-0.5 rounded uppercase">
                             {q.difficulty}
                           </span>
+                                  <span className="text-xs text-mono-gray-500 flex items-center gap-1 font-mono">
+                            <FiClock size={12} /> {q.timeLimit || 30}m
+                          </span>
+                                </div>
+                                <h4 className="text-base font-bold text-white leading-tight">{q.title}</h4>
+                                <p className="text-sm text-mono-gray-400 max-w-md line-clamp-2">{q.description}</p>
+                                <p className="text-xs text-mono-gray-500 font-mono">
+                                  {q.questionCount || 0} question{q.questionCount !== 1 ? 's' : ''}
+                                </p>
+                              </div>
+
+                              <button
+                                  onClick={() => handleDeleteQuiz(q.id)}
+                                  className="p-2.5 border border-mono-gray-800 group-hover:border-white text-mono-gray-400 group-hover:text-white rounded-lg transition-all duration-200 cursor-pointer opacity-0 group-hover:opacity-100"
+                              >
+                                <FiTrash2 size={16} />
+                              </button>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="text-center py-16 border-2 border-dashed border-mono-gray-800 rounded-xl">
+                          <p className="text-mono-gray-400 text-sm">No quizzes created yet.</p>
                         </div>
-                        <h4 className="text-sm font-bold text-white mt-1">{q.title}</h4>
-                        <p className="text-[11px] text-mono-gray-400 max-w-sm line-clamp-1">{q.description}</p>
-                        <p className="text-[10px] text-mono-gray-500 flex items-center gap-1 font-mono">
-                          <FiClock size={10} /> {q.timeLimit || 30}m | {q.questionCount || 0} questions
-                        </p>
-                      </div>
-                      
-                      <button
-                        onClick={() => handleDeleteQuiz(q.id)}
-                        className="p-2 border border-mono-gray-800 hover:border-white text-mono-gray-400 hover:text-white rounded-lg transition-colors cursor-pointer"
-                      >
-                        <FiTrash2 size={14} />
-                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+          )}
+
+          {/* TAB 2: QUESTIONS */}
+          {activeTab === 'questions' && (
+              <div className="grid lg:grid-cols-5 gap-10">
+                {/* Create Question Form */}
+                <form onSubmit={handleCreateQuestion} className="lg:col-span-2 space-y-6">
+                  <div className="flex items-center gap-3 pb-2">
+                    <FiPlus size={20} className="text-white" />
+                    <h3 className="text-xl font-display font-semibold text-white">Add New Question</h3>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-mono-gray-400 block">Question Content</label>
+                    <textarea
+                        placeholder="Enter the question text..."
+                        className="mono-input w-full min-h-[80px] resize-y"
+                        value={questText}
+                        onChange={(e) => setQuestText(e.target.value)}
+                        required
+                    />
+                  </div>
+
+                  {/* Options grid */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold text-mono-gray-400 block">Option A</label>
+                      <input
+                          type="text"
+                          placeholder="Choice A"
+                          className="mono-input w-full text-sm"
+                          value={questOptA}
+                          onChange={(e) => setQuestOptA(e.target.value)}
+                          required
+                      />
                     </div>
-                  ))
-                ) : (
-                  <p className="text-mono-gray-400 text-xs py-8 text-center border border-dashed border-mono-gray-800 rounded-xl">
-                    No quizzes created yet.
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold text-mono-gray-400 block">Option B</label>
+                      <input
+                          type="text"
+                          placeholder="Choice B"
+                          className="mono-input w-full text-sm"
+                          value={questOptB}
+                          onChange={(e) => setQuestOptB(e.target.value)}
+                          required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold text-mono-gray-400 block">Option C</label>
+                      <input
+                          type="text"
+                          placeholder="Choice C"
+                          className="mono-input w-full text-sm"
+                          value={questOptC}
+                          onChange={(e) => setQuestOptC(e.target.value)}
+                          required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold text-mono-gray-400 block">Option D</label>
+                      <input
+                          type="text"
+                          placeholder="Choice D"
+                          className="mono-input w-full text-sm"
+                          value={questOptD}
+                          onChange={(e) => setQuestOptD(e.target.value)}
+                          required
+                      />
+                    </div>
+                  </div>
 
-        {/* TAB 2: QUESTIONS */}
-        {activeTab === 'questions' && (
-          <div className="grid lg:grid-cols-5 gap-8">
-            {/* Create Question Form */}
-            <form onSubmit={handleCreateQuestion} className="lg:col-span-2 space-y-4">
-              <h3 className="text-lg font-display font-semibold text-white flex items-center gap-2">
-                <FiPlus size={16} /> Add New Question
-              </h3>
-
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-mono-gray-400">Question Content</label>
-                <textarea
-                  placeholder="Enter the question text..."
-                  className="mono-input min-h-[60px]"
-                  value={questText}
-                  onChange={(e) => setQuestText(e.target.value)}
-                  required
-                />
-              </div>
-
-              {/* Options grid */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-mono-gray-400">Option A</label>
-                  <input
-                    type="text"
-                    placeholder="Choice A"
-                    className="mono-input py-2 text-xs"
-                    value={questOptA}
-                    onChange={(e) => setQuestOptA(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-mono-gray-400">Option B</label>
-                  <input
-                    type="text"
-                    placeholder="Choice B"
-                    className="mono-input py-2 text-xs"
-                    value={questOptB}
-                    onChange={(e) => setQuestOptB(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-mono-gray-400">Option C</label>
-                  <input
-                    type="text"
-                    placeholder="Choice C"
-                    className="mono-input py-2 text-xs"
-                    value={questOptC}
-                    onChange={(e) => setQuestOptC(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-mono-gray-400">Option D</label>
-                  <input
-                    type="text"
-                    placeholder="Choice D"
-                    className="mono-input py-2 text-xs"
-                    value={questOptD}
-                    onChange={(e) => setQuestOptD(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Correct answer choice */}
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-mono-gray-400">Correct Answer Option</label>
-                <select
-                  className="mono-input bg-black text-xs py-2"
-                  value={questCorrect}
-                  onChange={(e) => setQuestCorrect(e.target.value)}
-                >
-                  <option value="optionA">Option A</option>
-                  <option value="optionB">Option B</option>
-                  <option value="optionC">Option C</option>
-                  <option value="optionD">Option D</option>
-                </select>
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-mono-gray-400">Topic Area</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Inheritance, Garbage Collection"
-                  className="mono-input text-xs"
-                  value={questTopic}
-                  onChange={(e) => setQuestTopic(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-mono-gray-400">Category</label>
-                  <select
-                    className="mono-input bg-black text-xs py-2"
-                    value={questCategory}
-                    onChange={(e) => setQuestCategory(e.target.value)}
-                  >
-                    {categories.map((c) => (
-                      <option key={c} value={c}>{c}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-mono-gray-400">Difficulty</label>
-                  <select
-                    className="mono-input bg-black text-xs py-2"
-                    value={questDifficulty}
-                    onChange={(e) => setQuestDifficulty(e.target.value)}
-                  >
-                    {difficulties.map((d) => (
-                      <option key={d} value={d}>{d}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-2.5 bg-white text-black text-xs font-bold rounded-lg hover:bg-black hover:text-white hover:border-white border border-white transition-all cursor-pointer flex items-center justify-center gap-1"
-              >
-                {loading ? (
-                  <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <>Add Question</>
-                )}
-              </button>
-            </form>
-
-            {/* List Questions */}
-            <div className="lg:col-span-3 space-y-4">
-              <h3 className="text-lg font-display font-semibold text-white">Active Questions ({questions.length})</h3>
-              
-              <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
-                {questions.length > 0 ? (
-                  questions.map((q) => (
-                    <div
-                      key={q.id}
-                      className="p-4 bg-black border border-mono-gray-800 rounded-xl flex items-start justify-between hover:border-mono-gray-500 transition-colors"
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-mono-gray-400 block">Correct Answer</label>
+                    <select
+                        className="mono-input w-full bg-black text-sm"
+                        value={questCorrect}
+                        onChange={(e) => setQuestCorrect(e.target.value)}
                     >
-                      <div className="space-y-2 flex-1 mr-2">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-extrabold bg-white text-black px-1 rounded uppercase tracking-wide">
-                            {q.category}
-                          </span>
-                          <span className="text-[9px] text-mono-gray-400 border border-mono-gray-700 px-1 rounded uppercase">
-                            {q.difficulty}
-                          </span>
-                          <span className="text-[9px] text-mono-gray-500 font-mono">
-                            Topic: {q.topic}
-                          </span>
-                        </div>
-                        <h4 className="text-xs font-semibold text-white leading-relaxed">{q.question}</h4>
-                        <div className="grid grid-cols-2 gap-1 text-[10px] text-mono-gray-400 font-mono">
-                          <div className={q.correctAnswer === 'optionA' ? 'text-white font-bold underline' : ''}>A: {q.optionA}</div>
-                          <div className={q.correctAnswer === 'optionB' ? 'text-white font-bold underline' : ''}>B: {q.optionB}</div>
-                          <div className={q.correctAnswer === 'optionC' ? 'text-white font-bold underline' : ''}>C: {q.optionC}</div>
-                          <div className={q.correctAnswer === 'optionD' ? 'text-white font-bold underline' : ''}>D: {q.optionD}</div>
-                        </div>
-                      </div>
-                      
-                      <button
-                        onClick={() => handleDeleteQuestion(q.id)}
-                        className="p-2 border border-mono-gray-800 hover:border-white text-mono-gray-400 hover:text-white rounded-lg transition-colors cursor-pointer shrink-0 mt-1"
+                      <option value="optionA">Option A</option>
+                      <option value="optionB">Option B</option>
+                      <option value="optionC">Option C</option>
+                      <option value="optionD">Option D</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-mono-gray-400 block">Topic Area</label>
+                    <input
+                        type="text"
+                        placeholder="e.g. Inheritance, Garbage Collection"
+                        className="mono-input w-full text-sm"
+                        value={questTopic}
+                        onChange={(e) => setQuestTopic(e.target.value)}
+                        required
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-5">
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-mono-gray-400 block">Category</label>
+                      <select
+                          className="mono-input w-full bg-black text-sm"
+                          value={questCategory}
+                          onChange={(e) => setQuestCategory(e.target.value)}
                       >
-                        <FiTrash2 size={13} />
-                      </button>
+                        {categories.map((c) => (
+                            <option key={c} value={c}>{c}</option>
+                        ))}
+                      </select>
                     </div>
-                  ))
-                ) : (
-                  <p className="text-mono-gray-400 text-xs py-8 text-center border border-dashed border-mono-gray-800 rounded-xl">
-                    No questions available. Add some using the creator form.
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-mono-gray-400 block">Difficulty</label>
+                      <select
+                          className="mono-input w-full bg-black text-sm"
+                          value={questDifficulty}
+                          onChange={(e) => setQuestDifficulty(e.target.value)}
+                      >
+                        {difficulties.map((d) => (
+                            <option key={d} value={d}>{d}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
 
-        {/* TAB 3: LINK ITEMS */}
-        {activeTab === 'assign' && (
-          <div className="max-w-2xl mx-auto py-8">
-            <form onSubmit={handleLinkQuestion} className="bg-black border border-mono-gray-800 p-6 rounded-2xl space-y-6">
-              <div className="text-center">
-                <FiLink className="text-white mx-auto mb-2" size={32} />
-                <h3 className="text-lg font-display font-semibold text-white">Link Questions to Quizzes</h3>
-                <p className="text-mono-gray-400 text-xs mt-1">Select a quiz and choose a question to attach to it.</p>
-              </div>
-
-              <div className="space-y-4">
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-mono-gray-400">1. Select Target Quiz</label>
-                  <select
-                    className="mono-input bg-black text-sm"
-                    value={selectedQuizId}
-                    onChange={(e) => setSelectedQuizId(e.target.value)}
-                    required
+                  <button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full py-3 bg-white text-black text-sm font-bold rounded-lg hover:bg-black hover:text-white hover:border-white border-2 border-white transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 mt-4"
                   >
-                    <option value="">-- Choose Quiz --</option>
-                    {quizzes.map((q) => (
-                      <option key={q.id} value={q.id}>
-                        {q.title} ({q.category} | {q.difficulty})
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                    {loading ? (
+                        <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                        <>Add Question</>
+                    )}
+                  </button>
+                </form>
 
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-mono-gray-400">2. Select Question to Add</label>
-                  <select
-                    className="mono-input bg-black text-sm"
-                    value={selectedQuestionId}
-                    onChange={(e) => setSelectedQuestionId(e.target.value)}
-                    required
-                  >
-                    <option value="">-- Choose Question --</option>
-                    {questions.map((q) => (
-                      <option key={q.id} value={q.id}>
-                        [{q.category} - {q.topic}] {q.question.substring(0, 50)}...
-                      </option>
-                    ))}
-                  </select>
+                {/* List Questions */}
+                <div className="lg:col-span-3 space-y-5">
+                  <div className="flex items-center justify-between pb-2">
+                    <h3 className="text-xl font-display font-semibold text-white">Active Questions</h3>
+                    <span className="text-sm text-mono-gray-400 bg-black px-3 py-1 rounded-full border border-mono-gray-800">
+                  {questions.length} total
+                </span>
+                  </div>
+
+                  <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                    {questions.length > 0 ? (
+                        questions.map((q) => (
+                            <div
+                                key={q.id}
+                                className="p-5 bg-black border border-mono-gray-800 rounded-xl hover:border-mono-gray-500 transition-all duration-200 group"
+                            >
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="space-y-3 flex-1">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-xs font-extrabold bg-white text-black px-2 py-0.5 rounded uppercase tracking-wide">
+                              {q.category}
+                            </span>
+                                    <span className="text-xs text-mono-gray-400 border border-mono-gray-700 px-2 py-0.5 rounded uppercase">
+                              {q.difficulty}
+                            </span>
+                                    <span className="text-xs text-mono-gray-500 font-mono">
+                              Topic: {q.topic}
+                            </span>
+                                  </div>
+                                  <h4 className="text-sm font-semibold text-white leading-relaxed">{q.question}</h4>
+                                  <div className="grid grid-cols-2 gap-2 text-xs text-mono-gray-400 font-mono">
+                                    <div className={q.correctAnswer === 'optionA' ? 'text-white font-bold' : ''}>A: {q.optionA}</div>
+                                    <div className={q.correctAnswer === 'optionB' ? 'text-white font-bold' : ''}>B: {q.optionB}</div>
+                                    <div className={q.correctAnswer === 'optionC' ? 'text-white font-bold' : ''}>C: {q.optionC}</div>
+                                    <div className={q.correctAnswer === 'optionD' ? 'text-white font-bold' : ''}>D: {q.optionD}</div>
+                                  </div>
+                                </div>
+
+                                <button
+                                    onClick={() => handleDeleteQuestion(q.id)}
+                                    className="p-2.5 border border-mono-gray-800 group-hover:border-white text-mono-gray-400 group-hover:text-white rounded-lg transition-all duration-200 cursor-pointer shrink-0 opacity-0 group-hover:opacity-100"
+                                >
+                                  <FiTrash2 size={14} />
+                                </button>
+                              </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="text-center py-16 border-2 border-dashed border-mono-gray-800 rounded-xl">
+                          <p className="text-mono-gray-400 text-sm">No questions available. Add some using the creator form.</p>
+                        </div>
+                    )}
+                  </div>
                 </div>
               </div>
+          )}
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3 bg-white text-black text-xs font-bold rounded-lg hover:bg-black hover:text-white hover:border-white border border-white transition-all cursor-pointer flex items-center justify-center gap-1.5"
-              >
-                {loading ? (
-                  <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <>
-                    <FiPlus size={14} /> Link Question to Quiz
-                  </>
-                )}
-              </button>
-            </form>
-          </div>
-        )}
+          {/* TAB 3: LINK ITEMS */}
+          {activeTab === 'assign' && (
+              <div className="max-w-3xl mx-auto py-8">
+                <form onSubmit={handleLinkQuestion} className="bg-black border border-mono-gray-800 p-8 rounded-2xl space-y-8">
+                  <div className="text-center space-y-3">
+                    <FiLink className="text-white mx-auto" size={36} />
+                    <h3 className="text-2xl font-display font-semibold text-white">Link Questions to Quizzes</h3>
+                    <p className="text-mono-gray-400 text-sm">Select a quiz and choose a question to attach to it.</p>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-mono-gray-400 block">1. Select Target Quiz</label>
+                      <select
+                          className="mono-input w-full bg-black text-base py-3"
+                          value={selectedQuizId}
+                          onChange={(e) => setSelectedQuizId(e.target.value)}
+                          required
+                      >
+                        <option value="">-- Choose Quiz --</option>
+                        {quizzes.map((q) => (
+                            <option key={q.id} value={q.id}>
+                              {q.title} ({q.category} | {q.difficulty})
+                            </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-mono-gray-400 block">2. Select Question to Add</label>
+                      <select
+                          className="mono-input w-full bg-black text-base py-3"
+                          value={selectedQuestionId}
+                          onChange={(e) => setSelectedQuestionId(e.target.value)}
+                          required
+                      >
+                        <option value="">-- Choose Question --</option>
+                        {questions.map((q) => (
+                            <option key={q.id} value={q.id}>
+                              [{q.category} - {q.topic}] {q.question.substring(0, 60)}...
+                            </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full py-3.5 bg-white text-black text-sm font-bold rounded-lg hover:bg-black hover:text-white hover:border-white border-2 border-white transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    {loading ? (
+                        <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                        <>
+                          <FiPlus size={16} /> Link Question to Quiz
+                        </>
+                    )}
+                  </button>
+                </form>
+              </div>
+          )}
+        </div>
+
+        {/* Custom scrollbar styles - add to your global CSS */}
+        <style jsx>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: #1a1a1a;
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #333;
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #555;
+        }
+      `}</style>
       </div>
-    </div>
   );
 };
 

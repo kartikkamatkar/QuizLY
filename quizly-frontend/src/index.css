@@ -1,10 +1,14 @@
-@import "tailwindcss";
+/* ALL @import statements MUST be at the VERY TOP */
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
 
+/* Theme configuration */
 @theme {
   --font-sans: 'Outfit', sans-serif;
   --font-display: 'Space Grotesk', sans-serif;
-  
+  --font-mono: 'JetBrains Mono', monospace;
+
   --color-mono-black: #000000;
   --color-mono-white: #ffffff;
   --color-mono-gray-900: #0a0a0a;
@@ -18,93 +22,204 @@
   --color-mono-gray-100: #f4f4f5;
 
   --animate-grid: grid-drift 20s linear infinite;
-  
-  @keyframes grid-drift {
-    0% { background-position: 0 0; }
-    100% { background-position: 40px 40px; }
-  }
+  --animate-pulse-slow: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Keyframes */
+@keyframes grid-drift {
+  0% { background-position: 0 0; }
+  100% { background-position: 40px 40px; }
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
 }
 
 /* Custom Base Styles */
-html, body {
-  background-color: #000000;
-  color: #ffffff;
-  font-family: 'Outfit', sans-serif;
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-  scroll-behavior: smooth;
-}
+@layer base {
+  html, body {
+    background-color: #000000;
+    color: #ffffff;
+    font-family: 'Outfit', sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+  }
 
-#root {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
+  #root {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
 
-/* Custom Webkit Scrollbars in Stark Black/White */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
+  /* Custom Webkit Scrollbars in Stark Black/White */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
 
-::-webkit-scrollbar-track {
-  background: #000000;
-}
+  ::-webkit-scrollbar-track {
+    background: #000000;
+  }
 
-::-webkit-scrollbar-thumb {
-  background: #2a2a2a;
-  border-radius: 3px;
-  border: 1px solid #000000;
-}
+  ::-webkit-scrollbar-thumb {
+    background: #2a2a2a;
+    border-radius: 3px;
+    border: 1px solid #000000;
+  }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #ffffff;
-}
+  ::-webkit-scrollbar-thumb:hover {
+    background: #ffffff;
+  }
 
-/* Custom Selection style */
-::selection {
-  background-color: #ffffff;
-  color: #000000;
+  /* Custom Selection style */
+  ::selection {
+    background-color: #ffffff;
+    color: #000000;
+  }
+
+  /* Focus visible outline for accessibility */
+  :focus-visible {
+    outline: 2px solid white;
+    outline-offset: 2px;
+  }
 }
 
 /* Custom animations and styling classes */
-.mono-grid-bg {
-  background-size: 40px 40px;
-  background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+@layer components {
+  .mono-grid-bg {
+    background-size: 40px 40px;
+    background-image:
+            linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    animation: grid-drift 20s linear infinite;
+  }
+
+  .mono-grid-bg-static {
+    background-size: 40px 40px;
+    background-image:
+            linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  }
+
+  .mono-glow-hover {
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .mono-glow-hover:hover {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
+    border-color: #ffffff;
+  }
+
+  .mono-border {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .mono-btn {
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+  }
+
+  .mono-btn-primary {
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    background-color: white;
+    color: black;
+    border: 1px solid white;
+  }
+
+  .mono-btn-primary:hover {
+    background-color: black;
+    color: white;
+  }
+
+  .mono-btn-secondary {
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    background-color: black;
+    color: white;
+    border: 1px solid var(--color-mono-gray-800);
+  }
+
+  .mono-btn-secondary:hover {
+    background-color: white;
+    color: black;
+    border-color: white;
+  }
+
+  .mono-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background-color: var(--color-mono-gray-900);
+    border: 1px solid var(--color-mono-gray-800);
+    border-radius: 0.5rem;
+    color: white;
+    font-family: 'Outfit', sans-serif;
+    transition: all 0.3s;
+  }
+
+  .mono-input:focus {
+    outline: none;
+    border-color: white;
+    outline: 1px solid white;
+  }
+
+  .mono-input::placeholder {
+    color: var(--color-mono-gray-500);
+  }
+
+  /* Form layout wrappers */
+  .auth-container {
+    position: relative;
+    max-width: 28rem;
+    width: 100%;
+    padding: 2rem;
+    background-color: rgba(10, 10, 10, 0.4);
+    backdrop-filter: blur(12px);
+    border-radius: 1rem;
+    border: 1px solid var(--color-mono-gray-800);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  }
+
+  /* Loading Spinner Animation */
+  .mono-spinner {
+    animation: spin 0.8s linear infinite;
+  }
 }
 
-.mono-glow-hover {
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.mono-glow-hover:hover {
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
-  border-color: #ffffff;
-}
+@layer utilities {
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
 
-.mono-border {
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
+  .text-balance {
+    text-wrap: balance;
+  }
 
-.mono-btn {
-  @apply px-6 py-3 font-semibold transition-all duration-300 rounded-lg flex items-center justify-center gap-2 cursor-pointer;
-}
-
-.mono-btn-primary {
-  @apply mono-btn bg-white text-black hover:bg-black hover:text-white border border-white;
-}
-
-.mono-btn-secondary {
-  @apply mono-btn bg-black text-white hover:bg-white hover:text-black border border-gray-800 hover:border-white;
-}
-
-.mono-input {
-  @apply w-full px-4 py-3 bg-mono-gray-900 border border-mono-gray-800 rounded-lg text-white font-sans transition-all duration-300 focus:outline-none focus:border-white focus:ring-1 focus:ring-white placeholder-mono-gray-500;
-}
-
-/* Form layout wrappers */
-.auth-container {
-  @apply relative max-w-md w-full p-8 bg-mono-gray-900/40 backdrop-blur-md rounded-2xl border border-mono-gray-800 shadow-2xl;
+  .text-pretty {
+    text-wrap: pretty;
+  }
 }

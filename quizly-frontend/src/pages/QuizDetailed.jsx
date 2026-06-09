@@ -41,117 +41,119 @@ const QuizDetailed = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
-        <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
-      </div>
+        <div className="min-h-screen flex items-center justify-center bg-black">
+          <div className="w-10 h-10 border-2 border-white border-t-transparent rounded-full animate-spin" />
+        </div>
     );
   }
 
   if (!quiz) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
-        <div className="text-center">
-          <FiAlertCircle className="mx-auto mb-4 text-mono-gray-400" size={48} />
-          <h2 className="text-2xl font-bold mb-2">Quiz Not Found</h2>
-          <p className="text-mono-gray-400 mb-6">The quiz you're looking for doesn't exist.</p>
-          <button onClick={() => navigate('/quizzes')} className="mono-btn-primary mx-auto">
-            Back to Quizzes
-          </button>
+        <div className="min-h-screen flex items-center justify-center bg-black px-6">
+          <div className="text-center max-w-md">
+            <FiAlertCircle className="mx-auto mb-5 text-mono-gray-400" size={52} />
+            <h2 className="text-3xl font-bold font-display text-white mb-3">Quiz Not Found</h2>
+            <p className="text-mono-gray-400 text-base mb-8">The quiz you're looking for doesn't exist.</p>
+            <button onClick={() => navigate('/quizzes')} className="mono-btn-primary mx-auto">
+              Back to Quizzes
+            </button>
+          </div>
         </div>
-      </div>
     );
   }
 
   return (
-    <div className="min-h-screen pt-28 pb-16 px-6 sm:px-8 bg-black mono-grid-bg">
-      <div className="max-w-4xl mx-auto">
-        <button
-          onClick={() => navigate('/quizzes')}
-          className="flex items-center gap-2 text-mono-gray-400 hover:text-white transition-colors text-sm font-semibold mb-6"
-        >
-          <FiArrowLeft size={16} />
-          <span>Back to Quizzes</span>
-        </button>
+      <div className="min-h-screen pt-28 pb-20 px-6 sm:px-8 bg-black mono-grid-bg">
+        <div className="max-w-5xl mx-auto">
+          <button
+              onClick={() => navigate('/quizzes')}
+              className="flex items-center gap-2.5 text-mono-gray-400 hover:text-white transition-all duration-200 text-sm font-semibold mb-8 group"
+          >
+            <FiArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform duration-200" />
+            <span>Back to Quizzes</span>
+          </button>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="bg-mono-gray-900 border border-mono-gray-800 rounded-3xl p-6 sm:p-10 relative overflow-hidden"
-        >
-          {/* Subtle grid light */}
-          <div className="absolute -top-40 -left-40 w-80 h-80 bg-white/5 blur-3xl rounded-full" />
+          <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="bg-mono-gray-900 border border-mono-gray-800 rounded-3xl p-6 sm:p-10 lg:p-12 relative overflow-hidden"
+          >
+            {/* Subtle grid light */}
+            <div className="absolute -top-40 -left-40 w-80 h-80 bg-white/5 blur-3xl rounded-full" />
+            <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-white/5 blur-3xl rounded-full" />
 
-          {/* Quiz Header */}
-          <div className="mb-10 relative">
-            <div className="flex flex-wrap items-center gap-3 mb-4">
-              <span className="text-[10px] bg-white text-black px-2 py-0.5 rounded font-extrabold uppercase font-sans tracking-wider">
+            {/* Quiz Header */}
+            <div className="mb-12 relative">
+              <div className="flex flex-wrap items-center gap-3 mb-5">
+              <span className="text-[11px] bg-white text-black px-2.5 py-0.5 rounded font-extrabold uppercase font-sans tracking-wider">
                 {quiz.category}
               </span>
-              <span className="text-[9px] text-white border border-mono-gray-600 px-2 py-0.5 rounded uppercase font-bold tracking-wider">
+                <span className="text-[10px] text-white border border-mono-gray-600 px-2.5 py-0.5 rounded uppercase font-bold tracking-wider">
                 {quiz.difficulty}
               </span>
-            </div>
-            <h1 className="text-4xl sm:text-5xl font-display font-bold text-white tracking-tight uppercase leading-none mb-4">
-              {quiz.title}
-            </h1>
-            <p className="text-mono-gray-400 text-base max-w-2xl leading-relaxed">
-              {quiz.description}
-            </p>
-          </div>
-
-          {/* Quiz Stats Grid */}
-          <div className="grid sm:grid-cols-3 gap-6 mb-10">
-            <div className="p-5 bg-black border border-mono-gray-800 rounded-2xl">
-              <div className="flex items-center gap-2 text-mono-gray-500 mb-2">
-                <FiBookOpen size={16} />
-                <span className="text-xs font-semibold uppercase tracking-wider">Category</span>
               </div>
-              <p className="text-base font-bold text-white uppercase">{quiz.category}</p>
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-bold text-white tracking-tighter uppercase leading-tight mb-5">
+                {quiz.title}
+              </h1>
+              <p className="text-mono-gray-400 text-base lg:text-lg max-w-3xl leading-relaxed">
+                {quiz.description}
+              </p>
             </div>
-            
-            <div className="p-5 bg-black border border-mono-gray-800 rounded-2xl">
-              <div className="flex items-center gap-2 text-mono-gray-500 mb-2">
-                <FiAward size={16} />
-                <span className="text-xs font-semibold uppercase tracking-wider">Question Density</span>
+
+            {/* Quiz Stats Grid */}
+            <div className="grid sm:grid-cols-3 gap-6 mb-12">
+              <div className="group p-5 bg-black border border-mono-gray-800 hover:border-mono-gray-500 rounded-2xl transition-all duration-200 hover:shadow-lg">
+                <div className="flex items-center gap-2.5 text-mono-gray-500 mb-3">
+                  <FiBookOpen size={18} />
+                  <span className="text-xs font-semibold uppercase tracking-wider">Category</span>
+                </div>
+                <p className="text-base lg:text-lg font-bold text-white uppercase">{quiz.category}</p>
               </div>
-              <p className="text-base font-bold text-white">{quiz.questionCount || 0} Questions</p>
-            </div>
 
-            <div className="p-5 bg-black border border-mono-gray-800 rounded-2xl">
-              <div className="flex items-center gap-2 text-mono-gray-500 mb-2">
-                <FiClock size={16} />
-                <span className="text-xs font-semibold uppercase tracking-wider">Time Available</span>
+              <div className="group p-5 bg-black border border-mono-gray-800 hover:border-mono-gray-500 rounded-2xl transition-all duration-200 hover:shadow-lg">
+                <div className="flex items-center gap-2.5 text-mono-gray-500 mb-3">
+                  <FiAward size={18} />
+                  <span className="text-xs font-semibold uppercase tracking-wider">Question Density</span>
+                </div>
+                <p className="text-base lg:text-lg font-bold text-white">{quiz.questionCount || 0} Questions</p>
               </div>
-              <p className="text-base font-bold text-white">{quiz.timeLimit || 30} Minutes</p>
+
+              <div className="group p-5 bg-black border border-mono-gray-800 hover:border-mono-gray-500 rounded-2xl transition-all duration-200 hover:shadow-lg">
+                <div className="flex items-center gap-2.5 text-mono-gray-500 mb-3">
+                  <FiClock size={18} />
+                  <span className="text-xs font-semibold uppercase tracking-wider">Time Available</span>
+                </div>
+                <p className="text-base lg:text-lg font-bold text-white">{quiz.timeLimit || 30} Minutes</p>
+              </div>
             </div>
-          </div>
 
-          {/* Guidelines / Instructions */}
-          <div className="mb-10 p-6 bg-black border border-mono-gray-800 rounded-2xl">
-            <h2 className="text-lg font-display font-semibold text-white mb-4 uppercase tracking-wider">
-              Instruction Set
-            </h2>
-            <ul className="space-y-3.5 text-xs text-mono-gray-400 font-sans">
-              <li className="flex items-start gap-2.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-white mt-1.5 shrink-0" />
-                <span>Submit answers question-by-question. You can traverse backward and forward.</span>
-              </li>
-              <li className="flex items-start gap-2.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-white mt-1.5 shrink-0" />
-                <span>Timer operates strictly in the background. Submit before expiration to prevent score invalidation.</span>
-              </li>
-              <li className="flex items-start gap-2.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-white mt-1.5 shrink-0" />
-                <span>Upon clicking Start, questions are synchronized immediately and attempts are logged dynamically.</span>
-              </li>
-              <li className="flex items-start gap-2.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-white mt-1.5 shrink-0" />
-                <span>Ensure your internet network is stable during the duration of the test.</span>
-              </li>
-            </ul>
-          </div>
+            {/* Guidelines / Instructions */}
+            <div className="mb-12 p-6 lg:p-8 bg-black border border-mono-gray-800 rounded-2xl">
+              <h2 className="text-xl font-display font-semibold text-white mb-5 uppercase tracking-wider">
+                Instruction Set
+              </h2>
+              <ul className="space-y-4 text-sm text-mono-gray-400 font-sans">
+                <li className="flex items-start gap-3">
+                  <span className="w-2 h-2 rounded-full bg-white mt-2 shrink-0" />
+                  <span className="leading-relaxed">Submit answers question-by-question. You can traverse backward and forward.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="w-2 h-2 rounded-full bg-white mt-2 shrink-0" />
+                  <span className="leading-relaxed">Timer operates strictly in the background. Submit before expiration to prevent score invalidation.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="w-2 h-2 rounded-full bg-white mt-2 shrink-0" />
+                  <span className="leading-relaxed">Upon clicking Start, questions are synchronized immediately and attempts are logged dynamically.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="w-2 h-2 rounded-full bg-white mt-2 shrink-0" />
+                  <span className="leading-relaxed">Ensure your internet network is stable during the duration of the test.</span>
+                </li>
+              </ul>
+            </div>
 
+<<<<<<< HEAD
           {/* Start Action Trigger */}
           <div className="flex flex-col sm:flex-row gap-4">
             <button
@@ -182,8 +184,26 @@ const QuizDetailed = () => {
             )}
           </div>
         </motion.div>
+=======
+            {/* Start Action Trigger */}
+            <button
+                onClick={handleStartQuiz}
+                disabled={starting}
+                className="w-full py-4.5 bg-white text-black hover:bg-black hover:text-white hover:border-white border-2 border-white rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2.5 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer group"
+            >
+              {starting ? (
+                  <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+              ) : (
+                  <>
+                    <FiPlay size={18} className="group-hover:scale-110 transition-transform duration-200" />
+                    <span className="tracking-wider">INITIATE TEST SEQUENCE</span>
+                  </>
+              )}
+            </button>
+          </motion.div>
+        </div>
+>>>>>>> 681ab92 (The Fronted added and integrated)
       </div>
-    </div>
   );
 };
 

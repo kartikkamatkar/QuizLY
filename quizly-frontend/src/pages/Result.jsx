@@ -20,7 +20,7 @@ const Result = () => {
       setResult(location.state.resultData);
       setQuizTitle(location.state.quizTitle || 'Quiz');
       setLoading(false);
-    } 
+    }
     // 2. Otherwise load attempt from API if attemptId is a valid number
     else if (attemptId && attemptId !== 'summary') {
       fetchAttemptResult(attemptId);
@@ -35,12 +35,12 @@ const Result = () => {
       // Fetch specific attempt
       const attemptResponse = await api.get(`/api/attempts/${id}`);
       const attempt = attemptResponse.data;
-      
+
       // Calculate percentage
       const score = attempt.score;
       const total = attempt.totalQuestions;
       const percentage = total > 0 ? (score / total) * 100 : 0;
-      
+
       // Determine feedback based on percent (mirroring backend logic)
       let feedback = '';
       if (percentage >= 80) feedback = "Excellent! Great job!";
@@ -73,24 +73,24 @@ const Result = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
-        <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
-      </div>
+        <div className="min-h-screen flex items-center justify-center bg-black">
+          <div className="w-10 h-10 border-2 border-white border-t-transparent rounded-full animate-spin" />
+        </div>
     );
   }
 
   if (!result) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black text-center px-4">
-        <div>
-          <FiActivity className="mx-auto mb-4 text-mono-gray-400 animate-bounce" size={48} />
-          <h2 className="text-2xl font-bold font-display text-white mb-2 uppercase">No Result Found</h2>
-          <p className="text-mono-gray-400 mb-6 max-w-sm">We couldn't resolve details for this quiz session.</p>
-          <Link to="/dashboard" className="mono-btn-primary mx-auto">
-            Go to Dashboard
-          </Link>
+        <div className="min-h-screen flex items-center justify-center bg-black text-center px-6">
+          <div className="max-w-md">
+            <FiActivity className="mx-auto mb-5 text-mono-gray-400 animate-bounce" size={52} />
+            <h2 className="text-3xl font-bold font-display text-white mb-3 uppercase">No Result Found</h2>
+            <p className="text-mono-gray-400 text-base mb-8 max-w-sm mx-auto">We couldn't resolve details for this quiz session.</p>
+            <Link to="/dashboard" className="mono-btn-primary mx-auto inline-block">
+              Go to Dashboard
+            </Link>
+          </div>
         </div>
-      </div>
     );
   }
 
@@ -98,109 +98,108 @@ const Result = () => {
   const strokeDashoffset = 280 - (280 * roundedPercentage) / 100;
 
   return (
-    <div className="min-h-screen pt-28 pb-16 px-6 sm:px-8 bg-black mono-grid-bg">
-      <div className="max-w-3xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className="bg-mono-gray-900 border border-mono-gray-800 rounded-3xl p-6 sm:p-10 text-center relative overflow-hidden"
-        >
-          {/* Glow backdrop */}
-          <div className="absolute -top-32 -left-32 w-64 h-64 bg-white/5 blur-3xl rounded-full" />
-          <div className="absolute -bottom-32 -right-32 w-64 h-64 bg-white/5 blur-3xl rounded-full" />
+      <div className="min-h-screen pt-28 pb-20 px-6 sm:px-8 bg-black mono-grid-bg">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className="bg-mono-gray-900 border border-mono-gray-800 rounded-3xl p-6 sm:p-10 lg:p-12 text-center relative overflow-hidden"
+          >
+            {/* Glow backdrop */}
+            <div className="absolute -top-32 -left-32 w-64 h-64 bg-white/5 blur-3xl rounded-full" />
+            <div className="absolute -bottom-32 -right-32 w-64 h-64 bg-white/5 blur-3xl rounded-full" />
 
-          {/* Icon Header */}
-          <div className="mb-4">
-            <FiAward className="mx-auto text-white" size={48} />
-          </div>
+            {/* Icon Header */}
+            <div className="mb-5">
+              <FiAward className="mx-auto text-white" size={52} />
+            </div>
 
-          <span className="text-[10px] font-bold text-mono-gray-400 font-mono tracking-widest uppercase block">
+            <span className="text-[11px] font-bold text-mono-gray-400 font-mono tracking-wider uppercase block">
             TEST SUMMARY SEQUENCE COMPLETED
           </span>
-          
-          <h1 className="text-3xl sm:text-4xl font-display font-bold text-white uppercase mt-2 mb-8 max-w-lg mx-auto">
-            {quizTitle}
-          </h1>
 
-          {/* SVG Circular Progress Bar in Stark B&W */}
-          <div className="relative w-44 h-44 mx-auto mb-8 flex items-center justify-center">
-            <svg className="w-full h-full transform -rotate-90">
-              {/* Outer ring */}
-              <circle
-                cx="88"
-                cy="88"
-                r="70"
-                className="stroke-mono-gray-800 fill-transparent"
-                strokeWidth="8"
-              />
-              {/* Inner animated ring */}
-              <motion.circle
-                cx="88"
-                cy="88"
-                r="70"
-                className="stroke-white fill-transparent"
-                strokeWidth="8"
-                strokeDasharray="440"
-                initial={{ strokeDashoffset: 440 }}
-                animate={{ strokeDashoffset: 440 - (440 * roundedPercentage) / 100 }}
-                transition={{ duration: 1, ease: 'easeOut' }}
-              />
-            </svg>
-            <div className="absolute flex flex-col items-center">
-              <span className="text-4xl font-display font-bold text-white">{roundedPercentage}%</span>
-              <span className="text-[10px] uppercase font-bold text-mono-gray-400 tracking-wider mt-0.5 font-mono">Accuracy</span>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold text-white uppercase mt-3 mb-10 max-w-2xl mx-auto leading-tight">
+              {quizTitle}
+            </h1>
+
+            {/* SVG Circular Progress Bar in Stark B&W */}
+            <div className="relative w-48 h-48 mx-auto mb-10 flex items-center justify-center">
+              <svg className="w-full h-full transform -rotate-90">
+                {/* Outer ring */}
+                <circle
+                    cx="96"
+                    cy="96"
+                    r="76"
+                    className="stroke-mono-gray-800 fill-transparent"
+                    strokeWidth="8"
+                />
+                {/* Inner animated ring */}
+                <motion.circle
+                    cx="96"
+                    cy="96"
+                    r="76"
+                    className="stroke-white fill-transparent"
+                    strokeWidth="8"
+                    strokeDasharray="477"
+                    initial={{ strokeDashoffset: 477 }}
+                    animate={{ strokeDashoffset: 477 - (477 * roundedPercentage) / 100 }}
+                    transition={{ duration: 1.2, ease: 'easeOut' }}
+                />
+              </svg>
+              <div className="absolute flex flex-col items-center">
+                <span className="text-5xl font-display font-bold text-white">{roundedPercentage}%</span>
+                <span className="text-[11px] uppercase font-bold text-mono-gray-400 tracking-wider mt-1 font-mono">Accuracy</span>
+              </div>
             </div>
-          </div>
 
-          {/* Feedback Section */}
-          <div className="max-w-md mx-auto mb-10 p-5 bg-black border border-mono-gray-800 rounded-2xl">
-            <p className="text-mono-gray-400 text-xs font-semibold uppercase tracking-wider font-mono">Evaluation Verdict</p>
-            <p className="text-lg font-semibold text-white mt-1.5 leading-relaxed">{result.feedback}</p>
-          </div>
-
-          {/* Statistics Grid */}
-          <div className="grid grid-cols-2 gap-4 max-w-md mx-auto mb-10 text-left">
-            <div className="p-4 bg-black border border-mono-gray-800 rounded-xl">
-              <span className="text-[10px] font-bold text-mono-gray-500 font-mono uppercase block">Correct Score</span>
-              <span className="text-xl font-bold text-white font-mono">{result.score}</span>
+            {/* Feedback Section */}
+            <div className="max-w-lg mx-auto mb-12 p-6 bg-black border border-mono-gray-800 rounded-2xl">
+              <p className="text-xs font-semibold uppercase tracking-wider font-mono text-mono-gray-400">Evaluation Verdict</p>
+              <p className="text-lg lg:text-xl font-semibold text-white mt-2 leading-relaxed">{result.feedback}</p>
             </div>
-            <div className="p-4 bg-black border border-mono-gray-800 rounded-xl">
-              <span className="text-[10px] font-bold text-mono-gray-500 font-mono uppercase block">Total Questions</span>
-              <span className="text-xl font-bold text-white font-mono">{result.totalQuestions}</span>
+
+            {/* Statistics Grid */}
+            <div className="grid grid-cols-2 gap-5 max-w-md mx-auto mb-12 text-left">
+              <div className="p-5 bg-black border border-mono-gray-800 rounded-xl hover:border-mono-gray-500 transition-all duration-200">
+                <span className="text-[11px] font-bold text-mono-gray-500 font-mono uppercase block mb-1">Correct Score</span>
+                <span className="text-2xl font-bold text-white font-mono">{result.score}</span>
+              </div>
+              <div className="p-5 bg-black border border-mono-gray-800 rounded-xl hover:border-mono-gray-500 transition-all duration-200">
+                <span className="text-[11px] font-bold text-mono-gray-500 font-mono uppercase block mb-1">Total Questions</span>
+                <span className="text-2xl font-bold text-white font-mono">{result.totalQuestions}</span>
+              </div>
             </div>
-          </div>
 
-          {/* Control Actions */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-lg mx-auto">
-            <button
-              onClick={() => navigate('/leaderboard')}
-              className="px-6 py-3 bg-white text-black hover:bg-black hover:text-white border border-white font-semibold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer text-xs uppercase font-mono font-bold"
-            >
-              <span>View Leaderboard</span>
-              <FiTrendingUp size={14} />
-            </button>
-            
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="px-6 py-3 bg-black text-white hover:bg-white hover:text-black border border-mono-gray-800 hover:border-white font-semibold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer text-xs uppercase font-mono font-bold"
-            >
-              <span>Go to Dashboard</span>
-              <FiGrid size={14} />
-            </button>
+            {/* Control Actions */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-2xl mx-auto">
+              <button
+                  onClick={() => navigate('/leaderboard')}
+                  className="px-7 py-3.5 bg-white text-black hover:bg-black hover:text-white border-2 border-white font-semibold rounded-lg transition-all duration-300 flex items-center justify-center gap-2.5 cursor-pointer text-xs uppercase font-mono font-bold group"
+              >
+                <span>View Leaderboard</span>
+                <FiTrendingUp size={15} className="group-hover:translate-x-1 transition-transform duration-200" />
+              </button>
 
-            <button
-              onClick={() => navigate('/quizzes')}
-              className="px-6 py-3 bg-black text-white hover:bg-white hover:text-black border border-mono-gray-800 hover:border-white font-semibold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer text-xs uppercase font-mono font-bold"
-            >
-              <span>Browse Quizzes</span>
-              <FiBookOpen size={14} />
-            </button>
-          </div>
+              <button
+                  onClick={() => navigate('/dashboard')}
+                  className="px-7 py-3.5 bg-black text-white hover:bg-white hover:text-black border-2 border-mono-gray-800 hover:border-white font-semibold rounded-lg transition-all duration-300 flex items-center justify-center gap-2.5 cursor-pointer text-xs uppercase font-mono font-bold"
+              >
+                <span>Go to Dashboard</span>
+                <FiGrid size={15} />
+              </button>
 
-        </motion.div>
+              <button
+                  onClick={() => navigate('/quizzes')}
+                  className="px-7 py-3.5 bg-black text-white hover:bg-white hover:text-black border-2 border-mono-gray-800 hover:border-white font-semibold rounded-lg transition-all duration-300 flex items-center justify-center gap-2.5 cursor-pointer text-xs uppercase font-mono font-bold"
+              >
+                <span>Browse Quizzes</span>
+                <FiBookOpen size={15} />
+              </button>
+            </div>
+          </motion.div>
+        </div>
       </div>
-    </div>
   );
 };
 
