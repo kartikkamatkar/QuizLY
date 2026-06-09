@@ -12,13 +12,9 @@ const QuizList = () => {
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('ALL');
   const [difficultyFilter, setDifficultyFilter] = useState('ALL');
-<<<<<<< HEAD
-  
-  const categories = ['ALL', 'JAVA', 'SPRING', 'REACT', 'DSA', 'DBMS', 'OS', 'CN', 'APTITUDE'];
-=======
 
-  const categories = ['ALL', 'JAVA', 'SPRING', 'REACT', 'DSA', 'DBMS', 'OS', 'CN'];
->>>>>>> 681ab92 (The Fronted added and integrated)
+  // Include APTITUDE category
+  const categories = ['ALL', 'JAVA', 'SPRING', 'REACT', 'DSA', 'DBMS', 'OS', 'CN', 'APTITUDE'];
   const difficulties = ['ALL', 'EASY', 'MEDIUM', 'HARD'];
 
   useEffect(() => {

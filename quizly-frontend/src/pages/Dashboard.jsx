@@ -67,7 +67,7 @@ const Dashboard = () => {
   const handleCreateLobby = async (e) => {
     e.preventDefault();
     if (!lobbyTitle) return;
-    
+
     setLobbyLoading(true);
     try {
       // Create Lobby: POST /api/competitions
@@ -79,7 +79,7 @@ const Dashboard = () => {
         hostUserId: user.id,
         hostUserName: user.name
       });
-      
+
       const comp = response.data;
       navigate(`/lobby/${comp.roomCode}`);
     } catch (err) {
@@ -198,46 +198,6 @@ const Dashboard = () => {
                       </div>
                     </div>
 
-<<<<<<< HEAD
-        {/* Dashboard Panels */}
-        <AnimatePresence mode="wait">
-          {isAdminView && user.role === 'ADMIN' ? (
-            <motion.div
-              key="admin-view"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.3 }}
-            >
-              <AdminPanel />
-            </motion.div>
-          ) : (
-            <motion.div
-              key="user-view"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.3 }}
-              className="space-y-12"
-            >
-              {/* Statistic Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                {/* CARD 1 */}
-                <div className="p-6 bg-mono-gray-900 border border-mono-gray-800 hover:border-white rounded-2xl flex items-center gap-5 transition-colors group">
-                  <div className="w-12 h-12 border border-mono-gray-800 group-hover:border-white rounded-xl flex items-center justify-center text-mono-gray-400 group-hover:text-white transition-colors">
-                    <FiActivity size={20} />
-                  </div>
-                  <div>
-                    <h3 className="text-xs font-semibold text-mono-gray-400 uppercase tracking-wide">Quizzes Completed</h3>
-                    <p className="text-3xl font-display font-bold text-white mt-1">{totalAttempts}</p>
-                  </div>
-                </div>
-
-                {/* CARD 2 */}
-                <div className="p-6 bg-mono-gray-900 border border-mono-gray-800 hover:border-white rounded-2xl flex items-center gap-5 transition-colors group">
-                  <div className="w-12 h-12 border border-mono-gray-800 group-hover:border-white rounded-xl flex items-center justify-center text-mono-gray-400 group-hover:text-white transition-colors">
-                    <FiAward size={20} />
-=======
                     {/* CARD 2 */}
                     <div className="group p-7 bg-mono-gray-900 border border-mono-gray-800 hover:border-mono-gray-500 rounded-2xl flex items-center gap-6 transition-all duration-200 hover:shadow-lg">
                       <div className="w-14 h-14 border border-mono-gray-800 group-hover:border-white rounded-xl flex items-center justify-center text-mono-gray-400 group-hover:text-white transition-all duration-200">
@@ -259,314 +219,207 @@ const Dashboard = () => {
                         <p className="text-4xl font-display font-bold text-white">{avgPercentage}%</p>
                       </div>
                     </div>
->>>>>>> 681ab92 (The Fronted added and integrated)
                   </div>
 
-<<<<<<< HEAD
-                {/* CARD 3 */}
-                <div className="p-6 bg-mono-gray-900 border border-mono-gray-800 hover:border-white rounded-2xl flex items-center gap-5 transition-colors group">
-                  <div className="w-12 h-12 border border-mono-gray-800 group-hover:border-white rounded-xl flex items-center justify-center text-mono-gray-400 group-hover:text-white transition-colors">
-                    <FiTrendingUp size={20} />
-                  </div>
-                  <div>
-                    <h3 className="text-xs font-semibold text-mono-gray-400 uppercase tracking-wide">Average Percentage</h3>
-                    <p className="text-3xl font-display font-bold text-white mt-1">{avgPercentage}%</p>
-                  </div>
-                </div>
-              </div>
+                  {/* Two Column Section: Left: History Logs, Right: Multiplayer Lobby tools */}
+                  <div className="grid lg:grid-cols-3 gap-8">
 
-              {/* Two Column Section: Left: History Logs, Right: Multiplayer Lobby tools */}
-              <div className="grid lg:grid-cols-3 gap-8">
-                
-                {/* LEFT: History Logs (Col span 2) */}
-                <div className="lg:col-span-2 bg-mono-gray-900 border border-mono-gray-800 rounded-2xl p-6 sm:p-8 flex flex-col justify-between">
-                  <div>
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-                      <div>
-                        <h2 className="text-xl font-display font-bold text-white">Your Attempt History</h2>
-                        <p className="text-mono-gray-400 text-xs mt-1">Review your score achievements on previous tests.</p>
-                      </div>
-                      <Link
-                        to="/quizzes"
-                        className="flex items-center gap-1.5 text-xs font-semibold text-white hover:underline shrink-0 font-mono"
-                      >
-                        <span>BROWSE QUIZZES</span>
-                        <FiArrowRight size={14} />
-                      </Link>
-                    </div>
-
-                    <div className="overflow-x-auto">
-                      {attempts.length > 0 ? (
-                        <table className="w-full text-left border-collapse">
-                          <thead>
-                            <tr className="border-b border-mono-gray-800 text-[10px] uppercase text-mono-gray-400 tracking-wider font-mono">
-                              <th className="pb-3 pl-2">Category</th>
-                              <th className="pb-3">Quiz Name</th>
-                              <th className="pb-3">Submit Date</th>
-                              <th className="pb-3 text-right pr-6">Score</th>
-                              <th className="pb-3 text-right pr-2">Accuracy</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {attempts.map((attempt) => {
-                              const percent = Math.round((attempt.score / attempt.totalQuestions) * 100);
-                              return (
-                                <tr
-                                  key={attempt.id}
-                                  className="border-b border-mono-gray-800/50 hover:bg-white/5 transition-colors text-sm"
-                                >
-                                  <td className="py-4 pl-2 font-semibold text-white">
-                                    <span className="text-[10px] bg-white text-black px-1.5 py-0.5 rounded font-extrabold font-sans uppercase">
-                                      {getQuizCategory(attempt.quizId)}
-                                    </span>
-                                  </td>
-                                  <td className="py-4 font-semibold text-white">
-                                    {getQuizTitle(attempt.quizId)}
-                                  </td>
-                                  <td className="py-4 text-mono-gray-400 text-xs font-mono">
-                                    {new Date(attempt.submittedAt).toLocaleDateString(undefined, {
-                                      year: 'numeric',
-                                      month: 'short',
-                                      day: 'numeric',
-                                    })}
-                                  </td>
-                                  <td className="py-4 text-right pr-6 font-mono font-bold text-white">
-                                    {attempt.score} / {attempt.totalQuestions}
-                                  </td>
-                                  <td className="py-4 text-right pr-2">
-                                    <span className={`inline-block font-mono font-semibold px-2 py-0.5 rounded text-xs ${
-                                      percent >= 80 
-                                        ? 'bg-white text-black font-extrabold border border-white' 
-                                        : percent >= 50 
-                                          ? 'text-white border border-mono-gray-600' 
-                                          : 'text-mono-gray-500 border border-mono-gray-800'
-                                    }`}>
-                                      {percent}%
-                                    </span>
-                                  </td>
-                                </tr>
-                              );
-                            })}
-                          </tbody>
-                        </table>
-                      ) : (
-                        <div className="text-center py-12 border border-dashed border-mono-gray-800 rounded-xl">
-                          <p className="text-mono-gray-400 text-sm">You haven't attempted any quizzes yet.</p>
-                          <Link
-                            to="/quizzes"
-                            className="mt-4 inline-flex px-5 py-2.5 bg-white text-black hover:bg-black hover:text-white border border-white rounded-lg text-xs font-bold transition-all cursor-pointer font-mono"
-                          >
-                            START FIRST SEQUENCE
-                          </Link>
+                    {/* LEFT: History Logs (Col span 2) */}
+                    <div className="lg:col-span-2 bg-mono-gray-900 border border-mono-gray-800 rounded-2xl p-6 sm:p-8 lg:p-10">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 mb-8">
+                        <div className="space-y-1.5">
+                          <h2 className="text-2xl font-display font-bold text-white">Your Attempt History</h2>
+                          <p className="text-mono-gray-400 text-sm">Review your score achievements on previous tests.</p>
                         </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* RIGHT: Multiplayer Arena (Col span 1) */}
-                <div className="space-y-6">
-                  {/* Join Room Box */}
-                  <div className="p-6 bg-mono-gray-900 border border-mono-gray-800 rounded-2xl space-y-4">
-                    <h3 className="text-sm font-bold font-display text-white uppercase tracking-wider flex items-center gap-2">
-                      <FiHash /> Join Match Code
-                    </h3>
-                    <form onSubmit={handleJoinLobby} className="flex gap-2">
-                      <input
-                        type="text"
-                        placeholder="ENTER ROOM CODE"
-                        maxLength={6}
-                        className="mono-input py-2.5 text-xs font-mono font-bold text-center tracking-widest uppercase"
-                        value={joinRoomCode}
-                        onChange={(e) => setJoinRoomCode(e.target.value)}
-                        required
-                      />
-                      <button
-                        type="submit"
-                        className="px-4 bg-white text-black font-semibold rounded-lg hover:bg-black hover:text-white border border-white text-xs transition-colors cursor-pointer"
-                      >
-                        JOIN
-                      </button>
-                    </form>
-                  </div>
-
-                  {/* Create Room Box */}
-                  <form onSubmit={handleCreateLobby} className="p-6 bg-mono-gray-900 border border-mono-gray-800 rounded-2xl space-y-4">
-                    <h3 className="text-sm font-bold font-display text-white uppercase tracking-wider flex items-center gap-2">
-                      <FiUsers /> Create Tournament
-                    </h3>
-
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-semibold text-mono-gray-400">Championship Title</label>
-                      <input
-                        type="text"
-                        placeholder="e.g. Speed OOP Java Match"
-                        className="mono-input py-2 text-xs"
-                        value={lobbyTitle}
-                        onChange={(e) => setLobbyTitle(e.target.value)}
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-semibold text-mono-gray-400">Select Module</label>
-                      <select
-                        className="mono-input bg-black py-2 text-xs"
-                        value={lobbyCategory}
-                        onChange={(e) => setLobbyCategory(e.target.value)}
-                      >
-                        {categories.map((c) => (
-                          <option key={c} value={c}>{c}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-1">
-                        <label className="text-[10px] font-semibold text-mono-gray-400">Questions count</label>
-                        <select
-                          className="mono-input bg-black py-2 text-xs"
-                          value={lobbyQCount}
-                          onChange={(e) => setLobbyQCount(e.target.value)}
+                        <Link
+                            to="/quizzes"
+                            className="flex items-center gap-2 text-sm font-semibold text-white hover:underline transition-all duration-200 shrink-0 group"
                         >
-                          <option value="5">5 Qs</option>
-                          <option value="10">10 Qs</option>
-                          <option value="15">15 Qs</option>
-                          <option value="20">20 Qs</option>
-                        </select>
+                          <span>Browse Quizzes</span>
+                          <FiArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-200" />
+                        </Link>
                       </div>
 
-                      <div className="space-y-1">
-                        <label className="text-[10px] font-semibold text-mono-gray-400">Time Limit</label>
-                        <select
-                          className="mono-input bg-black py-2 text-xs"
-                          value={lobbyTimeLimit}
-                          onChange={(e) => setLobbyTimeLimit(e.target.value)}
-                        >
-                          <option value="5">5m limit</option>
-                          <option value="10">10m limit</option>
-                          <option value="15">15m limit</option>
-                          <option value="20">20m limit</option>
-                          <option value="30">30m limit</option>
-                        </select>
+                      <div className="overflow-x-auto">
+                        {attempts.length > 0 ? (
+                            <table className="w-full text-left border-collapse min-w-[600px]">
+                              <thead>
+                              <tr className="border-b border-mono-gray-800 text-xs uppercase text-mono-gray-400 tracking-wider font-mono">
+                                <th className="pb-4 pl-3 font-semibold">Category</th>
+                                <th className="pb-4 font-semibold">Quiz Name</th>
+                                <th className="pb-4 font-semibold">Submit Date</th>
+                                <th className="pb-4 text-right pr-7 font-semibold">Score</th>
+                                <th className="pb-4 text-right pr-3 font-semibold">Accuracy</th>
+                              </tr>
+                              </thead>
+                              <tbody>
+                              {attempts.map((attempt, index) => {
+                                const percent = Math.round((attempt.score / attempt.totalQuestions) * 100);
+                                return (
+                                    <motion.tr
+                                        key={attempt.id}
+                                        initial={{ opacity: 0, x: -10 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: index * 0.05, duration: 0.2 }}
+                                        className="border-b border-mono-gray-800/50 hover:bg-white/5 transition-all duration-200 text-sm"
+                                    >
+                                      <td className="py-5 pl-3 font-semibold text-white">
+                                  <span className="text-[11px] bg-white text-black px-2 py-0.5 rounded font-extrabold font-sans uppercase">
+                                    {getQuizCategory(attempt.quizId)}
+                                  </span>
+                                      </td>
+                                      <td className="py-5 font-semibold text-white">
+                                        {getQuizTitle(attempt.quizId)}
+                                      </td>
+                                      <td className="py-5 text-mono-gray-400 text-xs font-mono">
+                                        {new Date(attempt.submittedAt).toLocaleDateString(undefined, {
+                                          year: 'numeric',
+                                          month: 'short',
+                                          day: 'numeric',
+                                        })}
+                                      </td>
+                                      <td className="py-5 text-right pr-7 font-mono font-bold text-white">
+                                        {attempt.score} / {attempt.totalQuestions}
+                                      </td>
+                                      <td className="py-5 text-right pr-3">
+                                  <span className={`inline-block font-mono font-semibold px-2.5 py-1 rounded text-xs ${
+                                      percent >= 80
+                                          ? 'bg-white text-black font-extrabold border border-white'
+                                          : percent >= 50
+                                              ? 'text-white border border-mono-gray-600'
+                                              : 'text-mono-gray-500 border border-mono-gray-800'
+                                  }`}>
+                                    {percent}%
+                                  </span>
+                                      </td>
+                                    </motion.tr>
+                                );
+                              })}
+                              </tbody>
+                            </table>
+                        ) : (
+                            <div className="text-center py-16 border-2 border-dashed border-mono-gray-800 rounded-xl">
+                              <p className="text-mono-gray-400 text-base mb-4">You haven't attempted any quizzes yet.</p>
+                              <Link
+                                  to="/quizzes"
+                                  className="inline-flex px-6 py-3 bg-white text-black hover:bg-black hover:text-white border-2 border-white rounded-lg text-sm font-bold transition-all duration-200 cursor-pointer"
+                              >
+                                Start Your First Quiz
+                              </Link>
+                            </div>
+                        )}
                       </div>
                     </div>
 
-                    <button
-                      type="submit"
-                      disabled={lobbyLoading}
-                      className="w-full py-2.5 bg-white text-black hover:bg-black hover:text-white border border-white font-bold rounded-lg text-xs tracking-wider uppercase font-mono transition-all duration-300 flex items-center justify-center gap-1 cursor-pointer disabled:opacity-50"
-                    >
-                      {lobbyLoading ? (
-                        <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
-                      ) : (
-                        <>
-                          <FiPlus size={12} />
-                          <span>CREATE ROOM</span>
-                        </>
-                      )}
-                    </button>
-                  </form>
-                </div>
-
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-=======
-                  {/* History Block */}
-                  <div className="bg-mono-gray-900 border border-mono-gray-800 rounded-2xl p-6 sm:p-8 lg:p-10">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 mb-8">
-                      <div className="space-y-1.5">
-                        <h2 className="text-2xl font-display font-bold text-white">Your Attempt History</h2>
-                        <p className="text-mono-gray-400 text-sm">Review your score achievements on previous tests.</p>
+                    {/* RIGHT: Multiplayer Arena (Col span 1) */}
+                    <div className="space-y-6">
+                      {/* Join Room Box */}
+                      <div className="p-6 bg-mono-gray-900 border border-mono-gray-800 rounded-2xl space-y-4">
+                        <h3 className="text-sm font-bold font-display text-white uppercase tracking-wider flex items-center gap-2">
+                          <FiHash /> Join Match Code
+                        </h3>
+                        <form onSubmit={handleJoinLobby} className="flex gap-2">
+                          <input
+                              type="text"
+                              placeholder="ENTER ROOM CODE"
+                              maxLength={6}
+                              className="mono-input py-2.5 text-xs font-mono font-bold text-center tracking-widest uppercase"
+                              value={joinRoomCode}
+                              onChange={(e) => setJoinRoomCode(e.target.value)}
+                              required
+                          />
+                          <button
+                              type="submit"
+                              className="px-4 bg-white text-black font-semibold rounded-lg hover:bg-black hover:text-white border border-white text-xs transition-colors cursor-pointer"
+                          >
+                            JOIN
+                          </button>
+                        </form>
                       </div>
-                      <Link
-                          to="/quizzes"
-                          className="flex items-center gap-2 text-sm font-semibold text-white hover:underline transition-all duration-200 shrink-0 group"
-                      >
-                        <span>Browse Quizzes</span>
-                        <FiArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-200" />
-                      </Link>
-                    </div>
 
-                    <div className="overflow-x-auto">
-                      {attempts.length > 0 ? (
-                          <table className="w-full text-left border-collapse min-w-[600px]">
-                            <thead>
-                            <tr className="border-b border-mono-gray-800 text-xs uppercase text-mono-gray-400 tracking-wider font-mono">
-                              <th className="pb-4 pl-3 font-semibold">Category</th>
-                              <th className="pb-4 font-semibold">Quiz Name</th>
-                              <th className="pb-4 font-semibold">Submit Date</th>
-                              <th className="pb-4 text-right pr-7 font-semibold">Score</th>
-                              <th className="pb-4 text-right pr-3 font-semibold">Accuracy</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {attempts.map((attempt, index) => {
-                              const percent = Math.round((attempt.score / attempt.totalQuestions) * 100);
-                              return (
-                                  <motion.tr
-                                      key={attempt.id}
-                                      initial={{ opacity: 0, x: -10 }}
-                                      animate={{ opacity: 1, x: 0 }}
-                                      transition={{ delay: index * 0.05, duration: 0.2 }}
-                                      className="border-b border-mono-gray-800/50 hover:bg-white/5 transition-all duration-200 text-sm"
-                                  >
-                                    <td className="py-5 pl-3 font-semibold text-white">
-                                <span className="text-[11px] bg-white text-black px-2 py-0.5 rounded font-extrabold font-sans uppercase">
-                                  {getQuizCategory(attempt.quizId)}
-                                </span>
-                                    </td>
-                                    <td className="py-5 font-semibold text-white">
-                                      {getQuizTitle(attempt.quizId)}
-                                    </td>
-                                    <td className="py-5 text-mono-gray-400 text-xs font-mono">
-                                      {new Date(attempt.submittedAt).toLocaleDateString(undefined, {
-                                        year: 'numeric',
-                                        month: 'short',
-                                        day: 'numeric',
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                      })}
-                                    </td>
-                                    <td className="py-5 text-right pr-7 font-mono font-bold text-white">
-                                      {attempt.score} / {attempt.totalQuestions}
-                                    </td>
-                                    <td className="py-5 text-right pr-3">
-                                <span className={`inline-block font-mono font-semibold px-2.5 py-1 rounded text-xs ${
-                                    percent >= 80
-                                        ? 'bg-white text-black font-extrabold border border-white'
-                                        : percent >= 50
-                                            ? 'text-white border border-mono-gray-600'
-                                            : 'text-mono-gray-500 border border-mono-gray-800'
-                                }`}>
-                                  {percent}%
-                                </span>
-                                    </td>
-                                  </motion.tr>
-                              );
-                            })}
-                            </tbody>
-                          </table>
-                      ) : (
-                          <div className="text-center py-16 border-2 border-dashed border-mono-gray-800 rounded-xl">
-                            <p className="text-mono-gray-400 text-base mb-4">You haven't attempted any quizzes yet.</p>
-                            <Link
-                                to="/quizzes"
-                                className="inline-flex px-6 py-3 bg-white text-black hover:bg-black hover:text-white border-2 border-white rounded-lg text-sm font-bold transition-all duration-200 cursor-pointer"
+                      {/* Create Room Box */}
+                      <form onSubmit={handleCreateLobby} className="p-6 bg-mono-gray-900 border border-mono-gray-800 rounded-2xl space-y-4">
+                        <h3 className="text-sm font-bold font-display text-white uppercase tracking-wider flex items-center gap-2">
+                          <FiUsers /> Create Tournament
+                        </h3>
+
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-semibold text-mono-gray-400">Championship Title</label>
+                          <input
+                              type="text"
+                              placeholder="e.g. Speed OOP Java Match"
+                              className="mono-input py-2 text-xs"
+                              value={lobbyTitle}
+                              onChange={(e) => setLobbyTitle(e.target.value)}
+                              required
+                          />
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-semibold text-mono-gray-400">Select Module</label>
+                          <select
+                              className="mono-input bg-black py-2 text-xs"
+                              value={lobbyCategory}
+                              onChange={(e) => setLobbyCategory(e.target.value)}
+                          >
+                            {categories.map((c) => (
+                                <option key={c} value={c}>{c}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-1">
+                            <label className="text-[10px] font-semibold text-mono-gray-400">Questions count</label>
+                            <select
+                                className="mono-input bg-black py-2 text-xs"
+                                value={lobbyQCount}
+                                onChange={(e) => setLobbyQCount(e.target.value)}
                             >
-                              Start Your First Quiz
-                            </Link>
+                              <option value="5">5 Qs</option>
+                              <option value="10">10 Qs</option>
+                              <option value="15">15 Qs</option>
+                              <option value="20">20 Qs</option>
+                            </select>
                           </div>
-                      )}
+
+                          <div className="space-y-1">
+                            <label className="text-[10px] font-semibold text-mono-gray-400">Time Limit</label>
+                            <select
+                                className="mono-input bg-black py-2 text-xs"
+                                value={lobbyTimeLimit}
+                                onChange={(e) => setLobbyTimeLimit(e.target.value)}
+                            >
+                              <option value="5">5m limit</option>
+                              <option value="10">10m limit</option>
+                              <option value="15">15m limit</option>
+                              <option value="20">20m limit</option>
+                              <option value="30">30m limit</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <button
+                            type="submit"
+                            disabled={lobbyLoading}
+                            className="w-full py-2.5 bg-white text-black hover:bg-black hover:text-white border border-white font-bold rounded-lg text-xs tracking-wider uppercase font-mono transition-all duration-300 flex items-center justify-center gap-1 cursor-pointer disabled:opacity-50"
+                        >
+                          {lobbyLoading ? (
+                              <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                              <>
+                                <FiPlus size={12} />
+                                <span>CREATE ROOM</span>
+                              </>
+                          )}
+                        </button>
+                      </form>
                     </div>
                   </div>
                 </motion.div>
             )}
           </AnimatePresence>
         </div>
->>>>>>> 681ab92 (The Fronted added and integrated)
       </div>
   );
 };

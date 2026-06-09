@@ -334,31 +334,17 @@ const AdminPanel = () => {
                     </div>
                   </div>
 
-<<<<<<< HEAD
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-mono-gray-400">Practice Sheet PDF URL (Optional)</label>
-                <input
-                  type="url"
-                  placeholder="https://example.com/practice.pdf"
-                  className="mono-input"
-                  value={quizPdfUrl}
-                  onChange={(e) => setQuizPdfUrl(e.target.value)}
-                />
-              </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-mono-gray-400 block">Practice Sheet PDF URL (Optional)</label>
+                    <input
+                        type="url"
+                        placeholder="https://example.com/practice.pdf"
+                        className="mono-input w-full"
+                        value={quizPdfUrl}
+                        onChange={(e) => setQuizPdfUrl(e.target.value)}
+                    />
+                  </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-2.5 bg-white text-black text-xs font-bold rounded-lg hover:bg-black hover:text-white hover:border-white border border-white transition-all cursor-pointer flex items-center justify-center gap-1"
-              >
-                {loading ? (
-                  <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <>Create Quiz</>
-                )}
-              </button>
-            </form>
-=======
                   <button
                       type="submit"
                       disabled={loading}
@@ -371,7 +357,6 @@ const AdminPanel = () => {
                     )}
                   </button>
                 </form>
->>>>>>> 681ab92 (The Fronted added and integrated)
 
                 {/* List Quizzes */}
                 <div className="lg:col-span-3 space-y-5">
@@ -682,7 +667,7 @@ const AdminPanel = () => {
           )}
         </div>
 
-        {/* Custom scrollbar styles - add to your global CSS */}
+        {/* Custom scrollbar styles */}
         <style jsx>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;

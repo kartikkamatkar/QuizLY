@@ -31,7 +31,7 @@ const QuizDetailed = () => {
     setStarting(true);
     try {
       // Must prepend /api to route through Gateway
-      const response = await api.get(`/api/quizzes/${id}/start`); // Wait, in controller it was GET /api/quizzes/{id}/start !
+      const response = await api.get(`/api/quizzes/${id}/start`);
       navigate(`/quiz/take/${id}`, { state: { quizSession: response.data } });
     } catch (error) {
       console.error('Error starting quiz:', error);
@@ -153,56 +153,37 @@ const QuizDetailed = () => {
               </ul>
             </div>
 
-<<<<<<< HEAD
-          {/* Start Action Trigger */}
-          <div className="flex flex-col sm:flex-row gap-4">
-            <button
-              onClick={handleStartQuiz}
-              disabled={starting}
-              className="flex-1 py-4 bg-white text-black hover:bg-black hover:text-white hover:border-white border border-white rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-            >
-              {starting ? (
-                <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
-              ) : (
-                <>
-                  <FiPlay size={18} />
-                  <span>INITIATE TEST SEQUENCE</span>
-                </>
-              )}
-            </button>
-
-            {quiz.pdfUrl && (
-              <a
-                href={quiz.pdfUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="py-4 px-6 bg-black text-white hover:bg-white hover:text-black border border-mono-gray-700 hover:border-white rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+            {/* Start Action Trigger with optional PDF Download */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <button
+                  onClick={handleStartQuiz}
+                  disabled={starting}
+                  className="flex-1 py-4.5 bg-white text-black hover:bg-black hover:text-white hover:border-white border-2 border-white rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2.5 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer group"
               >
-                <FiDownload size={18} />
-                <span>DOWNLOAD PDF SHEET</span>
-              </a>
-            )}
-          </div>
-        </motion.div>
-=======
-            {/* Start Action Trigger */}
-            <button
-                onClick={handleStartQuiz}
-                disabled={starting}
-                className="w-full py-4.5 bg-white text-black hover:bg-black hover:text-white hover:border-white border-2 border-white rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2.5 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer group"
-            >
-              {starting ? (
-                  <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
-              ) : (
-                  <>
-                    <FiPlay size={18} className="group-hover:scale-110 transition-transform duration-200" />
-                    <span className="tracking-wider">INITIATE TEST SEQUENCE</span>
-                  </>
+                {starting ? (
+                    <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                ) : (
+                    <>
+                      <FiPlay size={18} className="group-hover:scale-110 transition-transform duration-200" />
+                      <span className="tracking-wider">INITIATE TEST SEQUENCE</span>
+                    </>
+                )}
+              </button>
+
+              {quiz.pdfUrl && (
+                  <a
+                      href={quiz.pdfUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="py-4 px-6 bg-black text-white hover:bg-white hover:text-black border border-mono-gray-700 hover:border-white rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <FiDownload size={18} />
+                    <span>DOWNLOAD PDF SHEET</span>
+                  </a>
               )}
-            </button>
+            </div>
           </motion.div>
         </div>
->>>>>>> 681ab92 (The Fronted added and integrated)
       </div>
   );
 };
