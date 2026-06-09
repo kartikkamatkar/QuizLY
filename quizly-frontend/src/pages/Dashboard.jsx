@@ -13,6 +13,10 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [isAdminView, setIsAdminView] = useState(false);
 
+  // Gamification States
+  const [gamification, setGamification] = useState(null);
+  const [badges, setBadges] = useState([]);
+
   // Multiplayer Lobby Creation States
   const [lobbyTitle, setLobbyTitle] = useState('');
   const [lobbyCategory, setLobbyCategory] = useState('JAVA');
@@ -46,6 +50,15 @@ const Dashboard = () => {
       // 2. Fetch all quizzes to perform a client-side join (quizId -> title)
       const quizzesResponse = await api.get('/api/quizzes');
       setQuizzes(quizzesResponse.data);
+
+      // 3. Fetch User Gamification profile
+      try {
+        const gamificationResponse = await api.get(`/auth/gamification/user/${userId}`);
+        setGamification(gamificationResponse.data.stats);
+        setBadges(gamificationResponse.data.badges);
+      } catch (gameErr) {
+        console.error('Gamification statistics unavailable:', gameErr);
+      }
 
       setLoading(false);
     } catch (error) {
@@ -313,6 +326,58 @@ const Dashboard = () => {
 
                     {/* RIGHT: Multiplayer Arena (Col span 1) */}
                     <div className="space-y-6">
+                      {/* Gamification Level Box */}
+                      {gamification && (
+                        <div className="p-6 bg-mono-gray-900 border border-mono-gray-800 rounded-2xl space-y-4 shadow-lg hover:border-mono-gray-700 transition-all duration-200">
+                          <div className="flex justify-between items-center border-b border-mono-gray-800 pb-3">
+                            <h3 className="text-sm font-bold font-display text-white uppercase tracking-wider flex items-center gap-2">
+                              <FiTrendingUp /> Gamification Lvl {gamification.currentLevel}
+                            </h3>
+                            <span className="text-[10px] font-mono font-bold bg-white text-black px-1.5 py-0.5 rounded">
+                              {gamification.currentStreak}D STREAK
+                            </span>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-xs font-mono text-mono-gray-400">
+                              <span>Progress to Level Up</span>
+                              <span>{gamification.currentXp} XP</span>
+                            </div>
+                            <div className="w-full bg-black h-2.5 rounded-full overflow-hidden border border-mono-gray-800">
+                              <div 
+                                className="bg-white h-full transition-all duration-500"
+                                style={{ width: `${Math.min((gamification.currentXp % 100), 100)}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Earned Badges Box */}
+                      {badges.length > 0 && (
+                        <div className="p-6 bg-mono-gray-900 border border-mono-gray-800 rounded-2xl space-y-4 shadow-lg">
+                          <h3 className="text-sm font-bold font-display text-white uppercase tracking-wider flex items-center gap-2 border-b border-mono-gray-800 pb-3">
+                            <FiAward /> Earned Achievements
+                          </h3>
+                          <div className="grid grid-cols-3 gap-3">
+                            {badges.map((userBadge) => (
+                              <div 
+                                key={userBadge.id} 
+                                className="p-2 border border-mono-gray-800 bg-black rounded-xl text-center flex flex-col items-center justify-center space-y-1.5 group relative hover:border-white transition-all duration-200"
+                                title={userBadge.badge.description}
+                              >
+                                <span className="w-7 h-7 rounded-full border border-mono-gray-700 bg-mono-gray-900 flex items-center justify-center text-[10px] font-bold text-white group-hover:bg-white group-hover:text-black transition-all duration-200">
+                                  🏆
+                                </span>
+                                <span className="text-[9px] font-bold truncate max-w-full font-mono text-mono-gray-400 group-hover:text-white uppercase">
+                                  {userBadge.badge.name}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
                       {/* Join Room Box */}
                       <div className="p-6 bg-mono-gray-900 border border-mono-gray-800 rounded-2xl space-y-4">
                         <h3 className="text-sm font-bold font-display text-white uppercase tracking-wider flex items-center gap-2">

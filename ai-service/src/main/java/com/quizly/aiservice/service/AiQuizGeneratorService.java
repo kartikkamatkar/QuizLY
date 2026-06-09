@@ -113,9 +113,10 @@ public class AiQuizGeneratorService {
         String response = chatModel.call(prompt).getResult().getOutput().getContent();
 
         try {
-            if (response.contains("```")) {
-                response = response.substring(response.indexOf("["));
-                response = response.substring(0, response.lastIndexOf("]") + 1);
+            int startIndex = response.indexOf("[");
+            int endIndex = response.lastIndexOf("]");
+            if (startIndex != -1 && endIndex != -1 && endIndex > startIndex) {
+                response = response.substring(startIndex, endIndex + 1);
             }
             List<Map<String, Object>> rawList = objectMapper.readValue(response, new TypeReference<List<Map<String, Object>>>() {});
             return rawList.stream().map(map -> {

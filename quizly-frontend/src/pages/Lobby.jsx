@@ -25,9 +25,16 @@ const Lobby = () => {
   const [submitting, setSubmitting] = useState(false);
   const [userSubmitted, setUserSubmitted] = useState(false);
 
-  // Poll intervals references
+  // References
   const pollInterval = useRef(null);
   const timerInterval = useRef(null);
+  const stompClientRef = useRef(null);
+  const competitionRef = useRef(null);
+
+  // Update competitionRef when competition changes
+  useEffect(() => {
+    competitionRef.current = competition;
+  }, [competition]);
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
@@ -41,30 +48,120 @@ const Lobby = () => {
     }
 
     return () => {
+      disconnectWebSocket();
       clearInterval(pollInterval.current);
       clearInterval(timerInterval.current);
     };
   }, [roomCode]);
 
+  const disconnectWebSocket = () => {
+    if (stompClientRef.current) {
+      try {
+        stompClientRef.current.disconnect();
+      } catch (e) {
+        console.error("Error disconnecting WebSocket:", e);
+      }
+      stompClientRef.current = null;
+    }
+  };
+
+  const connectWebSocket = (currentUser, initialComp) => {
+    if (!window.SockJS || !window.Stomp) {
+      console.warn("SockJS/Stomp not available. Falling back to HTTP polling.");
+      initializeHttpPolling(currentUser);
+      return;
+    }
+
+    try {
+      const socket = new window.SockJS('http://localhost:6063/ws'); // Route via API Gateway
+      const client = window.Stomp.over(socket);
+      client.debug = () => {}; // Disable logs
+
+      client.connect({}, () => {
+        stompClientRef.current = client;
+
+        // Subscribe to room topics
+        client.subscribe(`/topic/room/${roomCode.toUpperCase()}`, (msg) => {
+          const payload = JSON.parse(msg.body);
+          handleWebSocketMessage(payload, currentUser, initialComp);
+        });
+
+        // Send JOIN socket mapping message
+        client.send(`/app/room/${roomCode.toUpperCase()}/join`, {}, JSON.stringify({
+          userId: currentUser.id,
+          userName: currentUser.name
+        }));
+
+      }, (err) => {
+        console.error("STOMP connection failed. Falling back to HTTP polling.", err);
+        initializeHttpPolling(currentUser);
+      });
+    } catch (e) {
+      console.error("Websocket init failed. Falling back to HTTP polling.", e);
+      initializeHttpPolling(currentUser);
+    }
+  };
+
+  const handleWebSocketMessage = (payload, currentUser, initialComp) => {
+    console.log("WS Event:", payload);
+    switch (payload.type) {
+      case 'USER_JOINED':
+        setParticipants(payload.participants);
+        break;
+      case 'COMPETITION_STARTED':
+        setStatus('ACTIVE');
+        const activeComp = competitionRef.current || initialComp;
+        loadRandomizedQuestions(activeComp);
+        break;
+      case 'LEADERBOARD_UPDATE':
+        setParticipants(payload.participants);
+        // Completed status check
+        const allDone = payload.participants.every(p => p.submitted);
+        if (allDone) {
+          setStatus('COMPLETED');
+        }
+        break;
+      default:
+        break;
+    }
+  };
+
   const initializeLobby = async (currentUser) => {
     try {
-      // 1. Join room
-      await api.post(`/api/competitions/${roomCode}/join`, {
-        userId: currentUser.id,
-        userName: currentUser.name
-      });
+      // 1. Load initial metadata
+      const response = await api.get(`/api/competitions/${roomCode}`);
+      const data = response.data;
 
-      // 2. Fetch initial room data
-      await fetchLobbyData();
+      setCompetition(data.competition);
+      setParticipants(data.participants);
+      setStatus(data.competition.status);
+
+      // Restore submit state if page refreshed
+      const selfPart = data.participants.find(p => p.userId === currentUser.id);
+      if (selfPart && selfPart.submitted) {
+        setUserSubmitted(true);
+      }
+
+      if (data.competition.status === 'ACTIVE') {
+        loadRandomizedQuestions(data.competition);
+      } else if (data.competition.status === 'COMPLETED') {
+        // Room already completed
+      } else {
+        // 2. Load WebSocket dynamic state
+        connectWebSocket(currentUser, data.competition);
+      }
+
       setLoading(false);
-
-      // 3. Start polling lobby state
-      pollInterval.current = setInterval(fetchLobbyData, 2000);
     } catch (err) {
       console.error(err);
       setError(err.response?.data || 'Failed to initialize competition lobby.');
       setLoading(false);
     }
+  };
+
+  const initializeHttpPolling = (currentUser) => {
+    fetchLobbyData();
+    pollInterval.current = setInterval(fetchLobbyData, 2000);
   };
 
   const fetchLobbyData = async () => {
@@ -76,9 +173,8 @@ const Lobby = () => {
       setParticipants(data.participants);
       setStatus(data.competition.status);
 
-      // Check if this user has already submitted (for page refreshes)
-      const userData = localStorage.getItem('user');
-      const currentUser = userData ? JSON.parse(userData) : null;
+      const currentUserData = localStorage.getItem('user');
+      const currentUser = currentUserData ? JSON.parse(currentUserData) : null;
       if (currentUser) {
         const selfPart = data.participants.find(p => p.userId === currentUser.id);
         if (selfPart && selfPart.submitted) {
@@ -86,14 +182,11 @@ const Lobby = () => {
         }
       }
 
-      // Check if status transitioned to ACTIVE and we haven't loaded questions yet
       if (data.competition.status === 'ACTIVE' && questions.length === 0) {
-        // Stop polling lobby metadata temporarily
         clearInterval(pollInterval.current);
         loadRandomizedQuestions(data.competition);
       }
 
-      // Check if status is COMPLETED
       if (data.competition.status === 'COMPLETED') {
         clearInterval(pollInterval.current);
         clearInterval(timerInterval.current);
@@ -103,27 +196,22 @@ const Lobby = () => {
     }
   };
 
-  // Load and shuffle questions for this user to ensure randomized quizzes
+  // Load and shuffle questions
   const loadRandomizedQuestions = async (compDetails) => {
+    if (!compDetails) return;
     try {
-      // Fetch all questions of selected category: /api/questions/category/{category}
       const response = await api.get(`/api/questions/category/${compDetails.category}`);
       let allQuestions = response.data;
 
       if (!allQuestions || allQuestions.length === 0) {
-        // Fallback: If no questions in category, try fetching generic questions
         const fallbackResp = await api.get('/api/questions?page=0&size=50');
         allQuestions = fallbackResp.data.content || [];
       }
 
-      // Shuffle list
       const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
-      // Slice to selected count
       const sliced = shuffled.slice(0, compDetails.questionCount);
 
       setQuestions(sliced);
-      
-      // Start test timer countdown
       setTimeRemaining(compDetails.timeLimit * 60);
       startTestTimer(compDetails.timeLimit * 60);
     } catch (err) {
@@ -146,6 +234,18 @@ const Lobby = () => {
 
   const handleStartCompetition = async () => {
     if (!user || !competition) return;
+
+    if (stompClientRef.current && stompClientRef.current.connected) {
+      try {
+        stompClientRef.current.send(`/app/room/${roomCode.toUpperCase()}/start`, {}, JSON.stringify({
+          hostUserId: user.id
+        }));
+        return;
+      } catch (wsErr) {
+        console.error("WS start failed, falling back to REST:", wsErr);
+      }
+    }
+
     try {
       await api.post(`/api/competitions/${roomCode}/start?userId=${user.id}`);
       fetchLobbyData();
@@ -189,7 +289,6 @@ const Lobby = () => {
     setSubmitting(true);
     clearInterval(timerInterval.current);
 
-    // Calculate score
     let score = 0;
     questions.forEach((q) => {
       const userAns = answers[q.id];
@@ -198,18 +297,28 @@ const Lobby = () => {
       }
     });
 
+    if (stompClientRef.current && stompClientRef.current.connected) {
+      try {
+        stompClientRef.current.send(`/app/room/${roomCode.toUpperCase()}/score`, {}, JSON.stringify({
+          userId: user.id,
+          score: score
+        }));
+        setUserSubmitted(true);
+        setSubmitting(false);
+        return;
+      } catch (wsErr) {
+        console.error("WS score submit failed, falling back to REST:", wsErr);
+      }
+    }
+
     try {
-      // Submit score: POST /api/competitions/{roomCode}/submit
       await api.post(`/api/competitions/${roomCode}/submit`, {
         userId: user.id,
         score: score
       });
-
       setUserSubmitted(true);
       setSubmitting(false);
-
-      // Start polling lobby again to wait for other users to submit
-      pollInterval.current = setInterval(fetchLobbyData, 2000);
+      initializeHttpPolling(user);
     } catch (err) {
       console.error('Error submitting score:', err);
       setError('Failed to submit score. Try again.');

@@ -21,15 +21,16 @@ public class AttemptEventListener {
         try {
             System.out.println("Received quiz-attempted event: " + event);
             
-            Long userId = ((Number) event.get("userId")).longValue();
-            Integer score = (Integer) event.get("score");
-            Integer totalQuestions = (Integer) event.get("totalQuestions");
+            Long userId = event.get("userId") != null ? ((Number) event.get("userId")).longValue() : null;
+            Integer score = event.get("score") != null ? ((Number) event.get("score")).intValue() : null;
+            Integer totalQuestions = event.get("totalQuestions") != null ? ((Number) event.get("totalQuestions")).intValue() : null;
 
             if (userId != null && score != null && totalQuestions != null) {
                 gamificationService.processAttemptCompleted(userId, score, totalQuestions);
             }
         } catch (Exception e) {
             System.err.println("Error consuming quiz-attempted event: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }

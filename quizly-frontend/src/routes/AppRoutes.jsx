@@ -12,6 +12,7 @@ import Result from '../pages/Result';
 import Leaderboard from '../pages/Leaderboard';
 import Competitions from '../pages/Competitions';
 import Lobby from '../pages/Lobby';
+import AiAssistant from '../pages/AiAssistant';
 
 const AppRoutes = () => {
   return (
@@ -82,6 +83,14 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute>
               <Lobby />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ai-hub"
+          element={
+            <ProtectedRoute>
+              <AiAssistant />
             </ProtectedRoute>
           }
         />
