@@ -19,13 +19,13 @@ import java.util.List;
 import java.util.Map;
 
 @Configuration
-@ConditionalOnProperty(name = "ai.mock", havingValue = "true", matchIfMissing = true)
 public class FallbackAiConfig {
 
     private static final Logger log = LoggerFactory.getLogger(FallbackAiConfig.class);
 
     @Bean
     @Primary
+    @ConditionalOnProperty(name = "ai.mock.chat", havingValue = "true", matchIfMissing = true)
     public ChatModel chatModel() {
         log.warn("Initializing Mock ChatModel Proxy in QuizService to bypass external OpenAI connections.");
         return (ChatModel) Proxy.newProxyInstance(
@@ -47,6 +47,7 @@ public class FallbackAiConfig {
 
     @Bean
     @Primary
+    @ConditionalOnProperty(name = "ai.mock.vectorstore", havingValue = "true", matchIfMissing = true)
     public VectorStore vectorStore() {
         log.warn("Initializing Mock VectorStore Proxy in QuizService to bypass external Qdrant database connections.");
         return (VectorStore) Proxy.newProxyInstance(

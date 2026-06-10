@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
-import { FiMail, FiLock, FiArrowRight, FiCheckCircle, FiAlertCircle, FiKey, FiArrowLeft, FiShield } from 'react-icons/fi';
+import { FiMail, FiLock, FiArrowRight, FiCheckCircle, FiAlertCircle, FiKey, FiArrowLeft, FiShield, FiEye, FiEyeOff } from 'react-icons/fi';
 import api from '../api/axios';
 
 const Login = () => {
@@ -11,6 +11,8 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
 
   // Password reset flow states
   const [showForgotPassword, setShowForgotPassword] = useState(false);
@@ -109,8 +111,8 @@ const Login = () => {
       setError('Please enter the full 6-digit OTP code.');
       return;
     }
-    if (newPassword.length < 6) {
-      setError('New password must be at least 6 characters.');
+    if (newPassword.length < 8) {
+      setError('New password must be at least 8 characters.');
       return;
     }
 
@@ -241,14 +243,21 @@ const Login = () => {
                       <FiLock size={18} className="text-mono-gray-500" />
                     </div>
                     <input
-                        type="password"
+                        type={showPassword ? 'text' : 'password'}
                         placeholder="Password"
-                        className="w-full bg-mono-gray-900 border border-mono-gray-800 rounded-lg px-4 py-3 pl-10 text-white text-sm focus:outline-none focus:border-white transition-all duration-200"
+                        className="w-full bg-mono-gray-900 border border-mono-gray-800 rounded-lg px-4 py-3 pl-10 pr-10 text-white text-sm focus:outline-none focus:border-white transition-all duration-200"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         disabled={loading}
                         required
                     />
+                    <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-mono-gray-500 hover:text-white transition-colors duration-200 cursor-pointer"
+                    >
+                      {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                    </button>
                   </div>
 
                   <div className="flex justify-end">
@@ -377,14 +386,21 @@ const Login = () => {
                             <FiLock size={18} className="text-mono-gray-500" />
                           </div>
                           <input
-                              type="password"
-                              placeholder="New Password (min 6 characters)"
-                              className="w-full bg-mono-gray-900 border border-mono-gray-800 rounded-lg px-4 py-3 pl-10 text-white text-sm focus:outline-none focus:border-white transition-all duration-200"
+                              type={showResetPassword ? 'text' : 'password'}
+                              placeholder="New Password (min 8 characters)"
+                              className="w-full bg-mono-gray-900 border border-mono-gray-800 rounded-lg px-4 py-3 pl-10 pr-10 text-white text-sm focus:outline-none focus:border-white transition-all duration-200"
                               value={newPassword}
                               onChange={(e) => setNewPassword(e.target.value)}
                               disabled={loading}
                               required
                           />
+                          <button
+                              type="button"
+                              onClick={() => setShowResetPassword(!showResetPassword)}
+                              className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-mono-gray-500 hover:text-white transition-colors duration-200 cursor-pointer"
+                          >
+                            {showResetPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                          </button>
                         </div>
 
                         <button

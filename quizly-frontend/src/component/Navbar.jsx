@@ -25,7 +25,7 @@ const Navbar = () => {
     localStorage.removeItem('user');
     setUser(null);
     setIsOpen(false);
-    navigate('/login');
+    navigate('/');
     window.location.reload(); // Force app re-render
   };
 
@@ -50,7 +50,7 @@ const Navbar = () => {
           <div className="flex justify-between items-center h-20">
             {/* Logo Section */}
             <Link
-                to="/"
+                to={user ? "/dashboard" : "/"}
                 className="text-2xl font-display font-bold text-white tracking-widest flex items-center gap-2 group"
             >
               QUIZ

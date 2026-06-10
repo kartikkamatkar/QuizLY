@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiArrowRight, FiShield, FiUser, FiMail, FiLock, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
+import { FiArrowRight, FiShield, FiUser, FiMail, FiLock, FiCheckCircle, FiAlertCircle, FiEye, FiEyeOff } from 'react-icons/fi';
 import api from '../api/axios';
 
 const Register = () => {
@@ -10,6 +10,7 @@ const Register = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   // OTP digits state
   const [otp, setOtp] = useState(['', '', '', '', '', '']); // Assuming 6-digit OTP
@@ -26,8 +27,8 @@ const Register = () => {
       setError('Please fill in all fields.');
       return;
     }
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters.');
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters.');
       return;
     }
 
@@ -234,14 +235,21 @@ const Register = () => {
                       <FiLock size={18} className="text-mono-gray-500" />
                     </div>
                     <input
-                        type="password"
-                        placeholder="Password (min 6 characters)"
-                        className="w-full bg-mono-gray-900 border border-mono-gray-800 rounded-lg px-4 py-3 pl-10 text-white text-sm focus:outline-none focus:border-white transition-all duration-200"
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="Password (min 8 characters)"
+                        className="w-full bg-mono-gray-900 border border-mono-gray-800 rounded-lg px-4 py-3 pl-10 pr-10 text-white text-sm focus:outline-none focus:border-white transition-all duration-200"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         disabled={loading}
                         required
                     />
+                    <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-mono-gray-500 hover:text-white transition-colors duration-200 cursor-pointer"
+                    >
+                      {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                    </button>
                   </div>
 
                   <button
