@@ -8,7 +8,7 @@ const Lobby = () => {
   const { roomCode } = useParams();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  
+
   // Lobby States
   const [competition, setCompetition] = useState(null);
   const [participants, setParticipants] = useState([]);
@@ -367,14 +367,14 @@ const Lobby = () => {
 
   return (
     <div className="min-h-screen pt-28 pb-16 px-6 sm:px-8 bg-black mono-grid-bg flex flex-col justify-between">
-      
+
       {/* 1. LOBBY STATE UI */}
       {status === 'LOBBY' && (
         <div className="max-w-4xl mx-auto w-full space-y-8">
           {/* Lobby Summary */}
           <div className="bg-mono-gray-900 border border-mono-gray-800 rounded-3xl p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative overflow-hidden">
             <div className="absolute -top-32 -left-32 w-64 h-64 bg-white/5 blur-3xl rounded-full" />
-            
+
             <div className="space-y-2 relative">
               <span className="text-[9px] font-bold text-mono-gray-500 font-mono tracking-widest uppercase">
                 COMPETITION LOBBY ACTIVE
@@ -498,12 +498,12 @@ const Lobby = () => {
               <h3 className="text-xs font-bold text-mono-gray-400 font-mono uppercase tracking-wider">
                 Question Grid
               </h3>
-              
+
               <div className="grid grid-cols-5 gap-2">
                 {questions.map((q, idx) => {
                   const answered = !!answers[q.id];
                   const active = idx === currentIdx;
-                  
+
                   return (
                     <button
                       key={q.id}
@@ -557,7 +557,7 @@ const Lobby = () => {
                       { key: 'optionD', val: activeQuestion.optionD, letter: 'D' }
                     ].map((opt) => {
                       const isSelected = answers[activeQuestion.id] === opt.key;
-                      
+
                       return (
                         <button
                           key={opt.key}
@@ -624,7 +624,7 @@ const Lobby = () => {
       {status === 'ACTIVE' && userSubmitted && (
         <div className="max-w-2xl mx-auto w-full text-center space-y-6 py-12">
           <div className="w-12 h-12 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          
+
           <span className="text-[10px] font-bold text-mono-gray-400 font-mono tracking-widest uppercase block">
             ANSWERS REGISTERED SUCCESSFULLY
           </span>
@@ -728,7 +728,7 @@ const Lobby = () => {
             <h3 className="text-xs font-bold text-mono-gray-400 font-mono uppercase tracking-wider mb-6">
               Competitor Standings
             </h3>
-            
+
             <div className="space-y-2">
               {[...participants]
                 .sort((a, b) => b.score - a.score)

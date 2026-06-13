@@ -21,14 +21,13 @@ public class VectorSearchService {
     // Index a question text and metadata into the vector database
     public void addQuestion(Question question) {
         Document doc = new Document(
-            question.getId().toString(),
-            question.getQuestion(),
-            Map.of(
-                "questionId", question.getId(),
-                "topic", question.getTopic() != null ? question.getTopic() : "",
-                "category", question.getCategory() != null ? question.getCategory().name() : "",
-                "difficulty", question.getDifficulty() != null ? question.getDifficulty().name() : ""
-            )
+                question.getQuestion(),
+                Map.of(
+                        "questionId", question.getId(),
+                        "topic", question.getTopic() != null ? question.getTopic() : "",
+                        "category", question.getCategory() != null ? question.getCategory().name() : "",
+                        "difficulty", question.getDifficulty() != null ? question.getDifficulty().name() : ""
+                )
         );
         vectorStore.add(List.of(doc));
     }
@@ -36,9 +35,10 @@ public class VectorSearchService {
     // Perform semantic similarity search across questions
     public List<Document> searchQuestions(String query, int limit) {
         return vectorStore.similaritySearch(
-            SearchRequest.defaults()
-                .withQuery(query)
-                .withTopK(limit)
+                SearchRequest.builder()
+                        .query(query)
+                        .topK(limit)
+                        .build()
         );
     }
 }

@@ -40,7 +40,7 @@ public class AiService {
                 """.formatted(count, topic, category, difficulty);
 
         Prompt prompt = new Prompt(systemText);
-        String response = chatModel.call(prompt).getResult().getOutput().getContent();
+        String response = chatModel.call(prompt).getResult().getOutput().getText();
 
         try {
             // Strip markdown block tags if LLM wraps it
@@ -74,6 +74,6 @@ public class AiService {
                 Provide a clear, brief, and educational explanation suitable for software engineers.
                 """.formatted(question, correctAnswer, options);
         Prompt prompt = new Prompt(systemText);
-        return chatModel.call(prompt).getResult().getOutput().getContent();
+        return chatModel.call(prompt).getResult().getOutput().getText();
     }
 }

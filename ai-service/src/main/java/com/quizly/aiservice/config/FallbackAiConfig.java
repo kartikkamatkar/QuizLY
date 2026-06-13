@@ -1,4 +1,4 @@
-package com.quizly.aiservice.config;
+package com.quizly.quizservice.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,19 +29,19 @@ public class FallbackAiConfig {
     public ChatModel chatModel() {
         log.warn("Initializing Mock ChatModel Proxy to bypass external OpenAI connections.");
         return (ChatModel) Proxy.newProxyInstance(
-            ChatModel.class.getClassLoader(),
-            new Class<?>[] { ChatModel.class },
-            (proxy, method, args) -> {
-                if ("call".equals(method.getName())) {
-                    String promptText = "";
-                    if (args.length > 0 && args[0] != null) {
-                        promptText = args[0].toString();
+                ChatModel.class.getClassLoader(),
+                new Class<?>[] { ChatModel.class },
+                (proxy, method, args) -> {
+                    if ("call".equals(method.getName())) {
+                        String promptText = "";
+                        if (args.length > 0 && args[0] != null) {
+                            promptText = args[0].toString();
+                        }
+                        String mockResult = generateMockResponse(promptText);
+                        return createMockChatResponse(mockResult);
                     }
-                    String mockResult = generateMockResponse(promptText);
-                    return createMockChatResponse(mockResult);
+                    return null;
                 }
-                return null;
-            }
         );
     }
 
@@ -51,46 +51,51 @@ public class FallbackAiConfig {
     public VectorStore vectorStore() {
         log.warn("Initializing Mock VectorStore Proxy to bypass external Qdrant database connections.");
         return (VectorStore) Proxy.newProxyInstance(
-            VectorStore.class.getClassLoader(),
-            new Class<?>[] { VectorStore.class },
-            (proxy, method, args) -> {
-                if ("similaritySearch".equals(method.getName())) {
-                    return List.of(new Document("Mock PDF Section context from RAG indexing.", Map.of("source", "pdf")));
+                VectorStore.class.getClassLoader(),
+                new Class<?>[] { VectorStore.class },
+                (proxy, method, args) -> {
+                    if ("similaritySearch".equals(method.getName())) {
+                        return List.of(new Document("Mock PDF Section context from RAG indexing.", Map.of("source", "pdf")));
+                    }
+                    return null;
                 }
-                return null;
-            }
         );
     }
 
     private static Object createMockChatResponse(String text) {
         return Proxy.newProxyInstance(
-            ChatResponse.class.getClassLoader(),
-            new Class<?>[] { ChatResponse.class },
-            (proxy, method, args) -> {
-                if ("getResult".equals(method.getName())) {
-                    return createMockGeneration(text);
+                ChatResponse.class.getClassLoader(),
+                new Class<?>[] { ChatResponse.class },
+                (proxy, method, args) -> {
+                    if ("getResult".equals(method.getName())) {
+                        return createMockGeneration(text);
+                    }
+                    if ("getResults".equals(method.getName())) {
+                        return List.of(createMockGeneration(text));
+                    }
+                    if ("getMetadata".equals(method.getName())) {
+                        // Safe dynamic proxy implementation of ChatResponseMetadata instead of calling .empty()
+                        return Proxy.newProxyInstance(
+                                ChatResponseMetadata.class.getClassLoader(),
+                                new Class<?>[] { ChatResponseMetadata.class },
+                                (metaProxy, metaMethod, metaArgs) -> null
+                        );
+                    }
+                    return null;
                 }
-                if ("getResults".equals(method.getName())) {
-                    return List.of(createMockGeneration(text));
-                }
-                if ("getMetadata".equals(method.getName())) {
-                    return ChatResponseMetadata.empty();
-                }
-                return null;
-            }
         );
     }
 
     private static Object createMockGeneration(String text) {
         return Proxy.newProxyInstance(
-            Generation.class.getClassLoader(),
-            new Class<?>[] { Generation.class },
-            (proxy, method, args) -> {
-                if ("getOutput".equals(method.getName())) {
-                    return new AssistantMessage(text);
+                Generation.class.getClassLoader(),
+                new Class<?>[] { Generation.class.getInterfaces().length > 0 ? Generation.class.getInterfaces()[0] : Object.class },
+                (proxy, method, args) -> {
+                    if ("getOutput".equals(method.getName())) {
+                        return new AssistantMessage(text);
+                    }
+                    return null;
                 }
-                return null;
-            }
         );
     }
 
@@ -128,7 +133,7 @@ public class FallbackAiConfig {
             ]
             """;
         }
-        
+
         if (prompt.contains("Explain") || prompt.contains("explain") || prompt.contains("explanation")) {
             return "AI Explanation (Mock): The correct answer is selected based on standard Spring Boot microservices patterns. Spring Cloud Config handles centralized Git settings, Eureka provides registry service locations, and API Gateway acts as the reverse proxy for authorization headers.";
         }

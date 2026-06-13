@@ -35,6 +35,6 @@ public class AiExplanationService {
                 );
 
         Prompt prompt = new Prompt(promptText);
-        return chatModel.call(prompt).getResult().getOutput().getContent();
+        return chatModel.call(prompt).getResult().getOutput().getText();
     }
 }

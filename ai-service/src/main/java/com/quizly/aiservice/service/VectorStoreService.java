@@ -26,9 +26,10 @@ public class VectorStoreService {
     // Similarity search to retrieve context documents from Qdrant Vector Database (RAG)
     public List<Document> findSimilar(String query, int limit) {
         return vectorStore.similaritySearch(
-            SearchRequest.defaults()
-                .withQuery(query)
-                .withTopK(limit)
+                SearchRequest.builder()
+                        .query(query)
+                        .topK(limit)
+                        .build()
         );
     }
 }

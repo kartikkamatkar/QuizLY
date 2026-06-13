@@ -39,7 +39,7 @@ const Login = () => {
         password
       });
 
-      const token = response.data;
+      const token = response.data.accessToken;
       if (token === 'password required' || token === 'User not found' || token === 'Invalid Credentials') {
         setError(token);
         setLoading(false);

@@ -34,7 +34,7 @@ services:
     image: redis:7-alpine
     container_name: redis
     ports:
-      - "6379:6379"
+      - "6380:6379"
     volumes:
       - redis_data:/data
     networks:
@@ -150,7 +150,7 @@ services:
       dockerfile: Dockerfile
     container_name: auth-service
     ports:
-      - "9090:9090"
+      - "9091:9090"
     depends_on:
       postgres:
         condition: service_healthy
@@ -238,20 +238,6 @@ services:
   ai-service:
     build:
       context: ./ai-service
-      dockerfile: Dockerfile
-    container_name: ai-service
-    ports:
-      - "6065:6065"
-    depends_on:
-      eureka-server:
-        condition: service_healthy
-      qdrant:
-        condition: service_started
-    environment:
-      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - QDRANT_HOST=qdrant
     networks:
       - quizly-network
 

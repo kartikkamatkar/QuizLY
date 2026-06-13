@@ -24,7 +24,7 @@ public class AiLearningAssistantService {
         // Step A: Similarity search in Vector DB (Qdrant) for context mapping
         List<Document> similarDocs = vectorStoreService.findSimilar(message, 3);
         String contextText = similarDocs.stream()
-                .map(Document::getContent)
+                .map(Document::getText)
                 .collect(Collectors.joining("\n---\n"));
 
         // Step B: Build RAG Prompt
@@ -41,7 +41,7 @@ public class AiLearningAssistantService {
                 """.formatted(contextText, message);
 
         Prompt prompt = new Prompt(promptText);
-        return chatModel.call(prompt).getResult().getOutput().getContent();
+        return chatModel.call(prompt).getResult().getOutput().getText();
     }
 
     // Generate a structured learning timeline based on topic interest
@@ -58,6 +58,6 @@ public class AiLearningAssistantService {
                 """.formatted(topicInterest);
 
         Prompt prompt = new Prompt(promptText);
-        return chatModel.call(prompt).getResult().getOutput().getContent();
+        return chatModel.call(prompt).getResult().getOutput().getText();
     }
 }

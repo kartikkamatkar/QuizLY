@@ -105,12 +105,12 @@ public class AiQuizGeneratorService {
                 """.formatted(question, options);
 
         Prompt prompt = new Prompt(promptText);
-        return chatModel.call(prompt).getResult().getOutput().getContent().trim().toUpperCase();
+        return chatModel.call(prompt).getResult().getOutput().getText().trim().toUpperCase();
     }
 
     private List<QuestionDto> callModelAndParse(String promptText) {
         Prompt prompt = new Prompt(promptText);
-        String response = chatModel.call(prompt).getResult().getOutput().getContent();
+        String response = chatModel.call(prompt).getResult().getOutput().getText();
 
         try {
             int startIndex = response.indexOf("[");

@@ -53,11 +53,17 @@ public class JwtFilter extends OncePerRequestFilter
         // returns 401. Public endpoints are handled by Spring Security's
         // permitAll() configuration, so the filter should not block them.
         String path = request.getRequestURI();
-        if (path.equals("/register") || path.startsWith("/auth/")) {
+        if (
+                path.equals("/register") ||
+                        path.equals("/auth/login") ||
+                        path.equals("/auth/register") ||
+                        path.equals("/auth/verifyotp") ||
+                        path.equals("/auth/forgetpass") ||
+                        path.equals("/auth/resetpass")
+        ) {
             filterChain.doFilter(request, response);
             return;
         }
-
         String authHeader = request.getHeader("Authorization");
 
         String token = null;

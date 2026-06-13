@@ -101,7 +101,7 @@ public class AnalyticsService {
                 """.formatted(weakTopicsStr);
 
         Prompt prompt = new Prompt(promptText);
-        String recommendations = chatModel.call(prompt).getResult().getOutput().getContent();
+        String recommendations = chatModel.call(prompt).getResult().getOutput().getText();
 
         return Map.of(
             "userId", userId,
