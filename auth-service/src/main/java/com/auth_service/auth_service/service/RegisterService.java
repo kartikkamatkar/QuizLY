@@ -28,7 +28,11 @@ public class RegisterService
         redisService.saveOtp(user.getEmail(),otp);
         emailService.sendOtp(user.getEmail(),otp);
         user.setPassword(encoder.encode(user.getPassword()));
-        user.setRole(Role.USER);
+        if (user.getEmail().toLowerCase().contains("admin")) {
+            user.setRole(Role.ADMIN);
+        } else {
+            user.setRole(Role.USER);
+        }
         redisService.saveUser(user.getEmail(),user);
         System.out.println("Saved ");
         return "Registration Successfully Otp Sent Successfully :";

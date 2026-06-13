@@ -15,11 +15,21 @@
   --color-mono-gray-800: #121212;
   --color-mono-gray-700: #1e1e1e;
   --color-mono-gray-600: #2a2a2a;
-  --color-mono-gray-500: #52525b;
-  --color-mono-gray-400: #a1a1aa;
-  --color-mono-gray-300: #d4d4d8;
-  --color-mono-gray-200: #e4e4e7;
-  --color-mono-gray-100: #f4f4f5;
+  --color-mono-gray-500: #a1a1aa; /* Increased brightness for text readability */
+  --color-mono-gray-400: #d4d4d8; /* Increased brightness */
+  --color-mono-gray-300: #e4e4e7;
+  --color-mono-gray-200: #f4f4f5;
+  --color-mono-gray-100: #ffffff;
+
+  --color-neutral-950: #050505;
+  --color-neutral-900: #0a0a0a;
+  --color-neutral-800: #121212;
+  --color-neutral-700: #1e1e1e;
+  --color-neutral-600: #a1a1aa; /* Increased brightness for text readability */
+  --color-neutral-500: #d4d4d8; /* Increased brightness */
+  --color-neutral-400: #e4e4e7;
+  --color-neutral-300: #f4f4f5;
+  --color-neutral-200: #ffffff;
 
   --animate-grid: grid-drift 20s linear infinite;
   --animate-pulse-slow: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;

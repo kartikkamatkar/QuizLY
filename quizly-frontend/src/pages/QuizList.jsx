@@ -140,7 +140,29 @@ const QuizList = () => {
 
           {/* Quizzes Grid layout */}
           <AnimatePresence mode="popLayout">
-            {filteredQuizzes.length > 0 ? (
+            {quizzes.length === 0 ? (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-center py-24 border border-mono-gray-800 rounded-3xl bg-mono-gray-900/20 backdrop-blur-sm p-10 max-w-2xl mx-auto"
+                >
+                  <div className="p-5 bg-mono-gray-900 border border-mono-gray-800 rounded-2xl mb-6 text-mono-gray-400 w-max mx-auto shadow-md">
+                    <FiBookOpen size={32} />
+                  </div>
+                  <h3 className="text-2xl font-bold font-display text-white uppercase tracking-wider mb-2.5">No Quizzes Found</h3>
+                  <p className="text-mono-gray-400 text-base mb-8 leading-relaxed">
+                    The platform curriculum is currently empty. Start by logging in as an administrator to create quizzes manually, or head over to the AI Hub to generate high-quality quizzes instantly with AI!
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
+                    <Link
+                        to="/ai-hub"
+                        className="w-full sm:w-auto px-8 py-4 bg-white text-black font-semibold rounded-lg hover:bg-black hover:text-white hover:border-white border-2 border-white transition-all duration-300 text-sm font-mono tracking-wider uppercase cursor-pointer"
+                    >
+                      Go to AI Hub Generator
+                    </Link>
+                  </div>
+                </motion.div>
+            ) : filteredQuizzes.length > 0 ? (
                 <motion.div
                     layout
                     className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
@@ -199,7 +221,7 @@ const QuizList = () => {
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="text-center py-20 border-2 border-dashed border-mono-gray-800 rounded-2xl"
+                    className="text-center py-20 border border-mono-gray-800 bg-mono-gray-900/10 rounded-3xl"
                 >
                   <p className="text-mono-gray-400 text-base mb-5">No quizzes match your selected filter criteria.</p>
                   <button

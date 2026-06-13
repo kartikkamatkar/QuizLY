@@ -155,3 +155,17 @@ Open `http://localhost:5173` in your browser. All API requests are automatically
 - **Authentication**: Login/Register requests hit `http://localhost:6063/auth/login` and `http://localhost:6063/auth/register`. A successful login returns a JWT token stored in `localStorage`, which is dynamically injected as an `Authorization: Bearer <token>` header in all subsequent API calls via Axios interceptors.
 - **AI Hub**: The interface routes requests to `/api/ai/**`, which is mapped to the AI Service through the Gateway. Here, users can ask questions to the RAG chat engine, upload a study PDF, evaluate the difficulty of questions, and get automated study guides based on their microservice progress history.
 - **Live Competitions**: Opponents pair up using match codes and establish connection channels via `/ws` WebSocket handshakes, communicating using standard STOMP topics.
+
+---
+
+## 🚀 DevOps & Observability Infrastructure
+
+QuizLY comes packaged with complete DevOps configurations and observability setups under the [devops/](file:///d:/Project/QuizLY/devops) folder. This includes:
+
+- **Docker-Compose backing services**: Databases, event brokers, and tracing engines (PostgreSQL, Redis, Kafka, Qdrant, Zipkin).
+- **Log Aggregation Stack**: Promtail & Loki configuration alongside Logstash pipelines for ELK.
+- **Monitoring & Metrics**: Prometheus scraping configurations and preconfigured Grafana metrics dashboards.
+- **Kubernetes Deployment manifests**: Complete declarations (`secrets`, `configmaps`, `ingress`, databases, and stateless microservice Deployments) optimized with liveness/readiness probes.
+
+For detailed information on the layout, configuration details, and running of the DevOps stack, refer to the [DevOps and Observability Guide](file:///d:/Project/QuizLY/devops/README.md).
+
