@@ -1,9 +1,13 @@
 package com.quizly.competitionservice.controller;
 
+import com.quizly.competitionservice.dto.CreateCompetitionRequest;
+import com.quizly.competitionservice.dto.JoinCompetitionRequest;
+import com.quizly.competitionservice.dto.SubmitScoreRequest;
 import com.quizly.competitionservice.entity.Competition;
 import com.quizly.competitionservice.entity.Participant;
 import com.quizly.competitionservice.repository.CompetitionRepository;
 import com.quizly.competitionservice.repository.ParticipantRepository;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,18 +40,26 @@ public class CompetitionController {
 
     // 1. Create a competition lobby
     @PostMapping
-    public ResponseEntity<?> createCompetition(@RequestBody Map<String, Object> request) {
-        try {
-            String title = (String) request.get("title");
-            String category = (String) request.get("category");
-            Integer questionCount = (Integer) request.get("questionCount");
-            Integer timeLimit = (Integer) request.get("timeLimit");
-            Long hostUserId = ((Number) request.get("hostUserId")).longValue();
-            String hostUserName = (String) request.get("hostUserName");
-
-            if (title == null || category == null || hostUserId == null) {
-                return ResponseEntity.badRequest().body("Missing required lobby details");
+    public ResponseEntity<?> createCompetition(
+            @Valid @RequestBody CreateCompetitionRequest request,
+            @RequestHeader(value = "X-User-Id", required = false) String xUserId) {
+        
+        if (xUserId != null && !xUserId.isEmpty()) {
+            Long headerUserId = Long.valueOf(xUserId);
+            if (!headerUserId.equals(request.getHostUserId())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized: Host User ID mismatch (BOLA)");
             }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Missing user identification header");
+        }
+
+        try {
+            String title = request.getTitle();
+            String category = request.getCategory();
+            Integer questionCount = request.getQuestionCount();
+            Integer timeLimit = request.getTimeLimit();
+            Long hostUserId = request.getHostUserId();
+            String hostUserName = request.getHostUserName();
 
             String code;
             // Ensure unique code
@@ -104,8 +116,18 @@ public class CompetitionController {
     @PostMapping("/{roomCode}/join")
     public ResponseEntity<?> joinCompetition(
             @PathVariable String roomCode, 
-            @RequestBody Map<String, Object> request) {
+            @Valid @RequestBody JoinCompetitionRequest request,
+            @RequestHeader(value = "X-User-Id", required = false) String xUserId) {
         
+        if (xUserId != null && !xUserId.isEmpty()) {
+            Long headerUserId = Long.valueOf(xUserId);
+            if (!headerUserId.equals(request.getUserId())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized: User ID mismatch (BOLA)");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Missing user identification header");
+        }
+
         String code = roomCode.toUpperCase();
         Optional<Competition> compOpt = competitionRepository.findByRoomCode(code);
         if (compOpt.isEmpty()) {
@@ -118,12 +140,8 @@ public class CompetitionController {
         }
 
         try {
-            Long userId = ((Number) request.get("userId")).longValue();
-            String userName = (String) request.get("userName");
-
-            if (userId == null || userName == null) {
-                return ResponseEntity.badRequest().body("User ID and Name are required");
-            }
+            Long userId = request.getUserId();
+            String userName = request.getUserName();
 
             Optional<Participant> partOpt = participantRepository.findByRoomCodeAndUserId(code, userId);
             if (partOpt.isPresent()) {
@@ -149,8 +167,18 @@ public class CompetitionController {
     @PostMapping("/{roomCode}/start")
     public ResponseEntity<?> startCompetition(
             @PathVariable String roomCode, 
-            @RequestParam Long userId) {
+            @RequestParam Long userId,
+            @RequestHeader(value = "X-User-Id", required = false) String xUserId) {
         
+        if (xUserId != null && !xUserId.isEmpty()) {
+            Long headerUserId = Long.valueOf(xUserId);
+            if (!headerUserId.equals(userId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized: User ID mismatch (BOLA)");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Missing user identification header");
+        }
+
         String code = roomCode.toUpperCase();
         Optional<Competition> compOpt = competitionRepository.findByRoomCode(code);
         if (compOpt.isEmpty()) {
@@ -176,8 +204,18 @@ public class CompetitionController {
     @PostMapping("/{roomCode}/submit")
     public ResponseEntity<?> submitScore(
             @PathVariable String roomCode, 
-            @RequestBody Map<String, Object> request) {
+            @Valid @RequestBody SubmitScoreRequest request,
+            @RequestHeader(value = "X-User-Id", required = false) String xUserId) {
         
+        if (xUserId != null && !xUserId.isEmpty()) {
+            Long headerUserId = Long.valueOf(xUserId);
+            if (!headerUserId.equals(request.getUserId())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized: User ID mismatch (BOLA)");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Missing user identification header");
+        }
+
         String code = roomCode.toUpperCase();
         Optional<Competition> compOpt = competitionRepository.findByRoomCode(code);
         if (compOpt.isEmpty()) {
@@ -186,12 +224,8 @@ public class CompetitionController {
 
         Competition comp = compOpt.get();
         try {
-            Long userId = ((Number) request.get("userId")).longValue();
-            Integer score = (Integer) request.get("score");
-
-            if (userId == null || score == null) {
-                return ResponseEntity.badRequest().body("User ID and Score are required");
-            }
+            Long userId = request.getUserId();
+            Integer score = request.getScore();
 
             Optional<Participant> partOpt = participantRepository.findByRoomCodeAndUserId(code, userId);
             if (partOpt.isEmpty()) {

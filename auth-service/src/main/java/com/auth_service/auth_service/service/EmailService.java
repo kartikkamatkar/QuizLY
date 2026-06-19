@@ -16,6 +16,6 @@ public class EmailService
         message.setSubject("OTP verification");
         message.setText("Your OTP is : "+otp);
         mailSender.send(message);
-        System.out.println("Email Sent ");
+        System.out.println("Email Sent. OTP for local testing: " + otp);
     }
 }

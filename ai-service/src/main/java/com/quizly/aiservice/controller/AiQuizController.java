@@ -3,6 +3,7 @@ package com.quizly.aiservice.controller;
 import com.quizly.aiservice.dto.AiQuizRequest;
 import com.quizly.aiservice.dto.QuestionDto;
 import com.quizly.aiservice.service.AiQuizGeneratorService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,7 +23,12 @@ public class AiQuizController {
 
     // 1. Generate quiz questions on a specific topic
     @PostMapping("/generate")
-    public ResponseEntity<?> generateQuiz(@RequestBody AiQuizRequest request) {
+    public ResponseEntity<?> generateQuiz(
+            @Valid @RequestBody AiQuizRequest request,
+            @RequestHeader(value = "X-User-Id", required = false) String xUserId) {
+        if (xUserId == null || xUserId.isEmpty()) {
+            throw new SecurityException("Unauthorized: Missing user identification header");
+        }
         try {
             int count = request.getQuestionCount() != null ? request.getQuestionCount() : 5;
             List<QuestionDto> questions = quizGeneratorService.generateQuiz(
@@ -51,12 +57,31 @@ public class AiQuizController {
             @RequestParam("topic") String topic,
             @RequestParam("category") String category,
             @RequestParam("difficulty") String difficulty,
-            @RequestParam(value = "questionCount", defaultValue = "5") int questionCount) {
+            @RequestParam(value = "questionCount", defaultValue = "5") int questionCount,
+            @RequestHeader(value = "X-User-Id", required = false) String xUserId) {
         
+        if (xUserId == null || xUserId.isEmpty()) {
+            throw new SecurityException("Unauthorized: Missing user identification header");
+        }
         try {
             if (file.isEmpty()) {
                 return ResponseEntity.badRequest().body("PDF file is empty!");
             }
+            // Strict PDF validation checks
+            String contentType = file.getContentType();
+            if (contentType == null || !contentType.equalsIgnoreCase("application/pdf")) {
+                return ResponseEntity.badRequest().body("Unsafe file upload: Content-Type must be application/pdf");
+            }
+            String filename = file.getOriginalFilename();
+            if (filename == null || !filename.toLowerCase().endsWith(".pdf")) {
+                return ResponseEntity.badRequest().body("Unsafe file upload: Filename must end with .pdf");
+            }
+            // Size limit: 10MB
+            long maxBytes = 10 * 1024 * 1024;
+            if (file.getSize() > maxBytes) {
+                return ResponseEntity.badRequest().body("Unsafe file upload: File size exceeds the maximum limit of 10MB");
+            }
+
             List<QuestionDto> questions = quizGeneratorService.generateQuizFromPdf(
                 file.getBytes(),
                 topic,
@@ -78,7 +103,12 @@ public class AiQuizController {
 
     // 3. Evaluate difficulty of a question text
     @PostMapping("/evaluate-difficulty")
-    public ResponseEntity<?> evaluateDifficulty(@RequestBody Map<String, String> body) {
+    public ResponseEntity<?> evaluateDifficulty(
+            @RequestBody Map<String, String> body,
+            @RequestHeader(value = "X-User-Id", required = false) String xUserId) {
+        if (xUserId == null || xUserId.isEmpty()) {
+            throw new SecurityException("Unauthorized: Missing user identification header");
+        }
         String question = body.get("question");
         String options = body.get("options");
 

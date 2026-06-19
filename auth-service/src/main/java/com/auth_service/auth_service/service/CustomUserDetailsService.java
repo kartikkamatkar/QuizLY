@@ -1,7 +1,7 @@
 package com.auth_service.auth_service.service;
 
 import com.auth_service.auth_service.entity.User;
-import com.auth_service.auth_service.repository.RegisterRepo;
+import com.auth_service.auth_service.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,7 +14,7 @@ public class CustomUserDetailsService
         implements UserDetailsService
 {
     @Autowired
-    private RegisterRepo repo;
+    private UserRepository repo;
 
     @Override
     public UserDetails loadUserByUsername(String username)

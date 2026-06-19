@@ -2,10 +2,7 @@ package com.example.attemptservice.controller;
 
 import com.example.attemptservice.service.AnalyticsService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -21,7 +18,21 @@ public class AnalyticsController {
 
     // Expose endpoint to retrieve personalized recommendations and weak topics
     @GetMapping("/{userId}")
-    public ResponseEntity<?> getUserAnalytics(@PathVariable Long userId) {
+    public ResponseEntity<?> getUserAnalytics(
+            @PathVariable Long userId,
+            @RequestHeader(value = "X-User-Id", required = false) String xUserId,
+            @RequestHeader(value = "X-User-Role", required = false) String xUserRole) {
+
+        if (xUserId != null && !xUserId.isEmpty()) {
+            Long headerUserId = Long.valueOf(xUserId);
+            boolean isAdmin = "ADMIN".equalsIgnoreCase(xUserRole);
+            if (!headerUserId.equals(userId) && !isAdmin) {
+                throw new SecurityException("Unauthorized: Access denied to this analytics dashboard (BOLA)");
+            }
+        } else {
+            throw new SecurityException("Unauthorized: Missing user identification header");
+        }
+
         Map<String, Object> result = analyticsService.getWeakTopicsAndRecommendations(userId);
         return ResponseEntity.ok(result);
     }

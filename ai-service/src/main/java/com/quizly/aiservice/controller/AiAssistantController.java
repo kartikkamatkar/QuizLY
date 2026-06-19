@@ -6,6 +6,7 @@ import com.quizly.aiservice.dto.LearningPathRequest;
 import com.quizly.aiservice.service.AiExplanationService;
 import com.quizly.aiservice.service.AiLearningAssistantService;
 import com.quizly.aiservice.service.AnalyticsService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +30,12 @@ public class AiAssistantController {
 
     // 1. Generate explanation for an answer selection
     @PostMapping("/explain")
-    public ResponseEntity<?> explainAnswer(@RequestBody ExplanationRequest request) {
+    public ResponseEntity<?> explainAnswer(
+            @Valid @RequestBody ExplanationRequest request,
+            @RequestHeader(value = "X-User-Id", required = false) String xUserId) {
+        if (xUserId == null || xUserId.isEmpty()) {
+            throw new SecurityException("Unauthorized: Missing user identification header");
+        }
         try {
             String explanation = explanationService.explainAnswer(request);
             return ResponseEntity.ok(Map.of("explanation", explanation));
@@ -40,7 +46,18 @@ public class AiAssistantController {
 
     // 2. Chatbot Learning Assistant (RAG context-aware chat)
     @PostMapping("/chat")
-    public ResponseEntity<?> askAssistant(@RequestBody ChatRequest request) {
+    public ResponseEntity<?> askAssistant(
+            @Valid @RequestBody ChatRequest request,
+            @RequestHeader(value = "X-User-Id", required = false) String xUserId,
+            @RequestHeader(value = "X-User-Role", required = false) String xUserRole) {
+        if (xUserId == null || xUserId.isEmpty()) {
+            throw new SecurityException("Unauthorized: Missing user identification header");
+        }
+        Long headerUserId = Long.valueOf(xUserId);
+        boolean isAdmin = "ADMIN".equalsIgnoreCase(xUserRole);
+        if (!headerUserId.equals(request.getUserId()) && !isAdmin) {
+            throw new SecurityException("Unauthorized: User ID mismatch (BOLA)");
+        }
         try {
             String response = learningAssistantService.askAssistant(request.getUserId(), request.getMessage());
             return ResponseEntity.ok(Map.of(
@@ -54,7 +71,18 @@ public class AiAssistantController {
 
     // 3. Generate a structured learning timeline
     @PostMapping("/learning-path")
-    public ResponseEntity<?> generateLearningPath(@RequestBody LearningPathRequest request) {
+    public ResponseEntity<?> generateLearningPath(
+            @Valid @RequestBody LearningPathRequest request,
+            @RequestHeader(value = "X-User-Id", required = false) String xUserId,
+            @RequestHeader(value = "X-User-Role", required = false) String xUserRole) {
+        if (xUserId == null || xUserId.isEmpty()) {
+            throw new SecurityException("Unauthorized: Missing user identification header");
+        }
+        Long headerUserId = Long.valueOf(xUserId);
+        boolean isAdmin = "ADMIN".equalsIgnoreCase(xUserRole);
+        if (!headerUserId.equals(request.getUserId()) && !isAdmin) {
+            throw new SecurityException("Unauthorized: User ID mismatch (BOLA)");
+        }
         try {
             String timeline = learningAssistantService.generateLearningPath(request.getUserId(), request.getTopicInterest());
             return ResponseEntity.ok(Map.of(
@@ -69,7 +97,18 @@ public class AiAssistantController {
 
     // 4. Scrapes user attempts history to calculate weak topics and dynamic recommendations
     @GetMapping("/analytics/recommendations/{userId}")
-    public ResponseEntity<?> getRecommendations(@PathVariable Long userId) {
+    public ResponseEntity<?> getRecommendations(
+            @PathVariable Long userId,
+            @RequestHeader(value = "X-User-Id", required = false) String xUserId,
+            @RequestHeader(value = "X-User-Role", required = false) String xUserRole) {
+        if (xUserId == null || xUserId.isEmpty()) {
+            throw new SecurityException("Unauthorized: Missing user identification header");
+        }
+        Long headerUserId = Long.valueOf(xUserId);
+        boolean isAdmin = "ADMIN".equalsIgnoreCase(xUserRole);
+        if (!headerUserId.equals(userId) && !isAdmin) {
+            throw new SecurityException("Unauthorized: Access denied to user recommendations (BOLA)");
+        }
         try {
             Map<String, Object> results = analyticsService.getWeakTopicsAndRecommendations(userId);
             return ResponseEntity.ok(results);

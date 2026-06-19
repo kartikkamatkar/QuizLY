@@ -1,30 +1,31 @@
-# Java
+# Java / Maven build
 target/
 *.jar
 *.war
+.mvn/wrapper/maven-wrapper.jar
 
-# Node
+# Node / Vite build
 node_modules/
 dist/
 
-# IDE
+# IDE / Editors
 .idea/
 .vscode/
 *.iml
+*.iws
+*.ipr
+.classpath
+.project
+.settings/
+.factorypath
+.apt_generated/
+.sts4-cache/
 
 # Logs
 *.log
 
-# Env
+# Env / Database
 .env
-.env
-.idea/
-*.log
-
-target/
-node_modules/
-*.jar
-# Docker
 postgres_data/
 redis_data/
 elasticsearch_data/

@@ -4,8 +4,5 @@ metadata:
   name: quizly-configmap
 data:
   EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eureka-server:8761/eureka/"
-  SPRING_CONFIG_IMPORT: "optional:configserver:http://config-server:8888"
   SPRING_DATA_REDIS_HOST: "redis"
   SPRING_DATA_REDIS_PORT: "6379"
-  SPRING_KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
-  MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: "http://zipkin:9411/api/v2/spans"

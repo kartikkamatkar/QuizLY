@@ -22,7 +22,12 @@ public class QuizController {
 
     // QUIZ APIs
     @PostMapping("/quizzes")
-    public QuizResponse createQuiz(@RequestBody QuizRequest request) {
+    public QuizResponse createQuiz(
+            @Valid @RequestBody QuizRequest request,
+            @RequestHeader(value = "X-User-Role", required = false) String xUserRole) {
+        if (xUserRole == null || !"ADMIN".equalsIgnoreCase(xUserRole)) {
+            throw new SecurityException("Unauthorized: Admin privilege required");
+        }
         return quizService.createQuiz(request);
     }
 
@@ -37,14 +42,23 @@ public class QuizController {
     }
 
     @DeleteMapping("/quizzes/{id}")
-    public String deleteQuiz(@PathVariable Long id) {
+    public String deleteQuiz(
+            @PathVariable Long id,
+            @RequestHeader(value = "X-User-Role", required = false) String xUserRole) {
+        if (xUserRole == null || !"ADMIN".equalsIgnoreCase(xUserRole)) {
+            throw new SecurityException("Unauthorized: Admin privilege required");
+        }
         quizService.deleteQuiz(id);
         return "Quiz Deleted Successfully";
     }
     @PostMapping("/quizzes/{quizId}/questions/{questionId}")
     public String addQuestionToQuiz(
             @PathVariable Long quizId,
-            @PathVariable Long questionId) {
+            @PathVariable Long questionId,
+            @RequestHeader(value = "X-User-Role", required = false) String xUserRole) {
+        if (xUserRole == null || !"ADMIN".equalsIgnoreCase(xUserRole)) {
+            throw new SecurityException("Unauthorized: Admin privilege required");
+        }
 
         quizService.addQuestionToQuiz(quizId, questionId);
 
@@ -63,7 +77,12 @@ public class QuizController {
 
     // QUESTION APIs
     @PostMapping("/questions")
-    public QuestionResponse addQuestion(@Valid @RequestBody QuestionRequest request) {
+    public QuestionResponse addQuestion(
+            @Valid @RequestBody QuestionRequest request,
+            @RequestHeader(value = "X-User-Role", required = false) String xUserRole) {
+        if (xUserRole == null || !"ADMIN".equalsIgnoreCase(xUserRole)) {
+            throw new SecurityException("Unauthorized: Admin privilege required");
+        }
         return quizService.addQuestion(request);
     }
 
@@ -80,12 +99,23 @@ public class QuizController {
     }
 
     @PutMapping("/questions/{id}")
-    public QuestionResponse updateQuestion(@PathVariable Long id, @Valid @RequestBody QuestionRequest request) {
+    public QuestionResponse updateQuestion(
+            @PathVariable Long id,
+            @Valid @RequestBody QuestionRequest request,
+            @RequestHeader(value = "X-User-Role", required = false) String xUserRole) {
+        if (xUserRole == null || !"ADMIN".equalsIgnoreCase(xUserRole)) {
+            throw new SecurityException("Unauthorized: Admin privilege required");
+        }
         return quizService.updateQuestion(id, request);
     }
 
     @DeleteMapping("/questions/{id}")
-    public String deleteQuestion(@PathVariable Long id) {
+    public String deleteQuestion(
+            @PathVariable Long id,
+            @RequestHeader(value = "X-User-Role", required = false) String xUserRole) {
+        if (xUserRole == null || !"ADMIN".equalsIgnoreCase(xUserRole)) {
+            throw new SecurityException("Unauthorized: Admin privilege required");
+        }
         quizService.deleteQuestion(id);
         return "Question Deleted Successfully";
     }
@@ -107,7 +137,17 @@ public class QuizController {
 
     @PostMapping("/quizzes/submit")
     public SubmitQuizResponse submitQuiz(
-            @RequestBody SubmitQuizRequest request) {
+            @RequestBody SubmitQuizRequest request,
+            @RequestHeader(value = "X-User-Id", required = false) String xUserId) {
+
+        if (xUserId != null && !xUserId.isEmpty()) {
+            Long headerUserId = Long.valueOf(xUserId);
+            if (!headerUserId.equals(request.getUserId())) {
+                throw new SecurityException("Unauthorized: User ID mismatch (BOLA)");
+            }
+        } else {
+            throw new SecurityException("Unauthorized: Missing user identification header");
+        }
 
         return quizService.submitQuiz(request);
     }

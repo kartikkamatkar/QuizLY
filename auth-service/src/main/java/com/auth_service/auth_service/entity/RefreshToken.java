@@ -1,23 +1,27 @@
 package com.auth_service.auth_service.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-
+import jakarta.persistence.*;
 import java.util.Date;
 
 @Entity
-public class RefreshToken
-{
+@Table(name = "refresh_tokens")
+public class RefreshToken {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String token ;
-    private Date expirydate;
-    private String name;
-    public RefreshToken(){
 
+    @Column(nullable = false, unique = true)
+    private String token;
+
+    @Column(nullable = false)
+    private Date expirydate;
+
+    @OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    private User user;
+
+    public RefreshToken() {
     }
 
     public Long getId() {
@@ -44,11 +48,11 @@ public class RefreshToken
         this.expirydate = expirydate;
     }
 
-    public String getName() {
-        return name;
+    public User getUser() {
+        return user;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUser(User user) {
+        this.user = user;
     }
 }

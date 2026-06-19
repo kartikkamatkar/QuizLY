@@ -29,14 +29,6 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: false, // Set to true for debugging in production
     rollupOptions: {
-      output: {
-        manualChunks: {
-          // Split vendor chunks for better caching
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-          ui: ['framer-motion', 'react-icons'],
-          http: ['axios'],
-        },
-      },
     },
   },
   optimizeDeps: {

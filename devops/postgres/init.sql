@@ -1,2 +1,4 @@
 CREATE DATABASE auth_core;
 CREATE DATABASE quizly;
+CREATE DATABASE attempts;
+CREATE DATABASE competitions;

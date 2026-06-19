@@ -1,4 +1,6 @@
 package com.example.attemptservice.service;
+
+import com.example.attemptservice.client.AuthServiceClient;
 import com.example.attemptservice.dto.DashboardResponse;
 import com.example.attemptservice.dto.LeaderboardResponse;
 import com.example.attemptservice.dto.AttemptRequest;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -16,14 +19,14 @@ public class AttemptService {
 
     private final QuizAttemptRepository attemptRepository;
     private final LeaderboardCacheService leaderboardCacheService;
-    private final org.springframework.kafka.core.KafkaTemplate<String, Object> kafkaTemplate;
+    private final AuthServiceClient authServiceClient;
 
     public AttemptService(QuizAttemptRepository attemptRepository, 
                           LeaderboardCacheService leaderboardCacheService,
-                          org.springframework.kafka.core.KafkaTemplate<String, Object> kafkaTemplate) {
+                          AuthServiceClient authServiceClient) {
         this.attemptRepository = attemptRepository;
         this.leaderboardCacheService = leaderboardCacheService;
-        this.kafkaTemplate = kafkaTemplate;
+        this.authServiceClient = authServiceClient;
     }
 
     public AttemptResponse saveAttempt(AttemptRequest request) {
@@ -36,8 +39,7 @@ public class AttemptService {
         attempt.setTotalQuestions(request.getTotalQuestions());
         attempt.setSubmittedAt(LocalDateTime.now());
 
-        QuizAttempt savedAttempt =
-                attemptRepository.save(attempt);
+        QuizAttempt savedAttempt = attemptRepository.save(attempt);
 
         // Update Redis real-time leaderboard cache
         try {
@@ -48,11 +50,15 @@ public class AttemptService {
 
         AttemptResponse response = mapToResponse(savedAttempt);
 
-        // Publish to Kafka topic 'quiz-attempted'
+        // Notify auth-service gamification via Feign (replaces Kafka)
         try {
-            kafkaTemplate.send("quiz-attempted", response.getUserId().toString(), response);
+            authServiceClient.processAttemptCompleted(Map.of(
+                    "userId", response.getUserId(),
+                    "score", response.getScore(),
+                    "totalQuestions", response.getTotalQuestions()
+            ));
         } catch (Exception e) {
-            System.err.println("Could not publish quiz-attempted event: " + e.getMessage());
+            System.err.println("Could not notify auth-service gamification: " + e.getMessage());
         }
 
         return response;
@@ -61,8 +67,7 @@ public class AttemptService {
     public AttemptResponse getAttemptById(Long id) {
 
         QuizAttempt attempt = attemptRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Attempt not found"));
+                .orElseThrow(() -> new RuntimeException("Attempt not found"));
 
         return mapToResponse(attempt);
     }
@@ -86,29 +91,25 @@ public class AttemptService {
     public void deleteAttempt(Long id) {
 
         QuizAttempt attempt = attemptRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Attempt not found"));
+                .orElseThrow(() -> new RuntimeException("Attempt not found"));
 
         attemptRepository.delete(attempt);
     }
 
-    private AttemptResponse mapToResponse(
-            QuizAttempt attempt) {
+    private AttemptResponse mapToResponse(QuizAttempt attempt) {
 
-        AttemptResponse response =
-                new AttemptResponse();
+        AttemptResponse response = new AttemptResponse();
 
         response.setId(attempt.getId());
         response.setUserId(attempt.getUserId());
         response.setQuizId(attempt.getQuizId());
         response.setScore(attempt.getScore());
-        response.setTotalQuestions(
-                attempt.getTotalQuestions());
-        response.setSubmittedAt(
-                attempt.getSubmittedAt());
+        response.setTotalQuestions(attempt.getTotalQuestions());
+        response.setSubmittedAt(attempt.getSubmittedAt());
 
         return response;
     }
+
     public List<LeaderboardResponse> getLeaderboard() {
         // Try fetching from Redis Cache first
         try {
@@ -141,16 +142,14 @@ public class AttemptService {
 
         return dbLeaderboard;
     }
+
     public DashboardResponse getDashboard(Long userId) {
 
-        List<QuizAttempt> attempts =
-                attemptRepository.findByUserId(userId);
+        List<QuizAttempt> attempts = attemptRepository.findByUserId(userId);
 
-        DashboardResponse response =
-                new DashboardResponse();
+        DashboardResponse response = new DashboardResponse();
 
-        response.setTotalAttempts(
-                (long) attempts.size());
+        response.setTotalAttempts((long) attempts.size());
 
         response.setHighestScore(
                 attempts.stream()

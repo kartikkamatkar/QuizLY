@@ -1,10 +1,29 @@
 package com.quizly.aiservice.dto;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 public class AiQuizRequest {
+    @NotBlank(message = "Title is required")
+    @Size(min = 3, max = 150, message = "Title must be between 3 and 150 characters")
     private String title;
+
+    @NotBlank(message = "Topic is required")
+    @Size(min = 2, max = 150, message = "Topic must be between 2 and 150 characters")
     private String topic;
+
+    @NotBlank(message = "Category is required")
     private String category;
+
+    @NotBlank(message = "Difficulty is required")
     private String difficulty;
+
+    @NotNull(message = "Question count is required")
+    @Min(value = 1, message = "Minimum 1 question required")
+    @Max(value = 50, message = "Maximum 50 questions allowed")
     private Integer questionCount;
 
     public String getTitle() {
