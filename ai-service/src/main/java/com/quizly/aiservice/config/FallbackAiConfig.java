@@ -62,41 +62,10 @@ public class FallbackAiConfig {
         );
     }
 
-    private static Object createMockChatResponse(String text) {
-        return Proxy.newProxyInstance(
-                ChatResponse.class.getClassLoader(),
-                new Class<?>[] { ChatResponse.class },
-                (proxy, method, args) -> {
-                    if ("getResult".equals(method.getName())) {
-                        return createMockGeneration(text);
-                    }
-                    if ("getResults".equals(method.getName())) {
-                        return List.of(createMockGeneration(text));
-                    }
-                    if ("getMetadata".equals(method.getName())) {
-                        // Safe dynamic proxy implementation of ChatResponseMetadata instead of calling .empty()
-                        return Proxy.newProxyInstance(
-                                ChatResponseMetadata.class.getClassLoader(),
-                                new Class<?>[] { ChatResponseMetadata.class },
-                                (metaProxy, metaMethod, metaArgs) -> null
-                        );
-                    }
-                    return null;
-                }
-        );
-    }
-
-    private static Object createMockGeneration(String text) {
-        return Proxy.newProxyInstance(
-                Generation.class.getClassLoader(),
-                new Class<?>[] { Generation.class.getInterfaces().length > 0 ? Generation.class.getInterfaces()[0] : Object.class },
-                (proxy, method, args) -> {
-                    if ("getOutput".equals(method.getName())) {
-                        return new AssistantMessage(text);
-                    }
-                    return null;
-                }
-        );
+    private static ChatResponse createMockChatResponse(String text) {
+        AssistantMessage assistantMessage = new AssistantMessage(text);
+        Generation generation = new Generation(assistantMessage);
+        return new ChatResponse(List.of(generation));
     }
 
     private static String generateMockResponse(String prompt) {
