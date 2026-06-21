@@ -24,6 +24,11 @@ public class LeaderboardCacheService {
         redisTemplate.opsForZSet().incrementScore(LEADERBOARD_KEY, userId.toString(), score.doubleValue());
     }
 
+    public void setScore(Long userId, Long score) {
+        // Set/overwrite user's total score in the leaderboard Redis Sorted Set
+        redisTemplate.opsForZSet().add(LEADERBOARD_KEY, userId.toString(), score.doubleValue());
+    }
+
     public List<LeaderboardResponse> getTopLeaderboard(int limit) {
         Set<ZSetOperations.TypedTuple<Object>> range = redisTemplate.opsForZSet()
                 .reverseRangeWithScores(LEADERBOARD_KEY, 0, limit - 1);

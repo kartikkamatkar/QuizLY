@@ -134,7 +134,7 @@ public class AttemptService {
         // Populate cache safely
         try {
             for (LeaderboardResponse entry : dbLeaderboard) {
-                leaderboardCacheService.updateScore(entry.getUserId(), entry.getTotalScore());
+                leaderboardCacheService.setScore(entry.getUserId(), entry.getTotalScore());
             }
         } catch (Exception e) {
             System.err.println("Could not prime leaderboard cache: " + e.getMessage());

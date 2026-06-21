@@ -14,6 +14,7 @@ This document is designed to help you prepare for technical interviews. It break
 7. [WebSockets & STOMP for Real-time Duels](#7-real-time-matchmaking-via-websockets)
 8. [RAG, Vector DBs & Spring AI Integration](#8-retrieval-augmented-generation-rag--spring-ai)
 9. [Distributed Tracing (observability)](#9-distributed-tracing-observability)
+10. [Real-World Troubleshooting Scenarios](#10-real-world-troubleshooting-scenarios)
 
 ---
 
@@ -163,3 +164,30 @@ In microservices, a single click can trigger 5 different HTTP and Kafka calls. I
 
 ### 🗣️ How to explain in an interview:
 > *"To make the system production-ready, I added observability using distributed tracing. Using Micrometer, every incoming user request gets a unique Trace ID injected into its headers. As the request travels from the Gateway to the Quiz Service, and publishes events via Kafka, this Trace ID is carried along. I used Zipkin to visualize these traces. This lets me identify performance bottlenecks and see exactly where an error occurred across the network."*
+
+---
+
+## 10. Real-World Troubleshooting Scenarios
+
+Interviewers frequently ask: *"Tell me about a time you had to debug a complex issue in a microservice environment."* Here are three concrete, real-world troubleshooting scenarios based on QuizLY's development:
+
+### Scenario A: Feign Client Security Context & Header Propagation
+- **The Issue**: After adding Broken Object Level Authorization (BOLA) security checks in `attempt-service` (verifying `X-User-Id` request headers from the Gateway), recommendations in the AI service and quiz submission results stopped working. The logs showed Feign client requests were hitting the `AttemptServiceClientFallback`, returning empty lists.
+- **The Cause**: The API Gateway propagates `X-User-Id` when requests come from clients, but service-to-service calls using OpenFeign bypass the Gateway. Because the Feign clients did not propagate these headers, the downstream `attempt-service` rejected them as unauthorized.
+- **The Fix**: Updated the declarative `@FeignClient` interfaces to accept `@RequestHeader("X-User-Id")` parameters and pass them through when calling the endpoints.
+- **🗣️ How to explain**:
+  > *"When we implemented BOLA verification in our attempt service, we realized our service-to-service OpenFeign calls were failing silently because security headers injected by the API Gateway were not automatically propagated to downstream Feign calls. I modified the Feign interface declarations to accept request headers explicitly, propagating user security contexts across the internal microservice mesh."*
+
+### Scenario B: AI Model Output Schema Alignment
+- **The Issue**: Quizzes generated via the AI service evaluated to `0` score on submission, even when users selected the correct answers.
+- **The Cause**: Admin-created quizzes stored the `correctAnswer` field as the option key (`optionA`, `optionB`, etc.). However, the LLM prompts and fallbacks in `ai-service` generated `correctAnswer` as the option's text value (e.g., `"Centralized configuration management"`). During submission, the scoring logic did a direct string check between user choices and correct answers, resulting in a mismatch.
+- **The Fix**: Refined the LLM prompts in `AiQuizGeneratorService` and mock responses in `FallbackAiConfig` to strictly output option keys (`optionA`/`optionB`/etc.) rather than raw text.
+- **🗣️ How to explain**:
+  > *"We faced a data format misalignment where our AI service generated quiz answers as raw strings, but our backend and frontend expected structured option keys like 'optionA' or 'optionB'. I updated the system prompt templates and mock fallbacks to explicitly enforce JSON response schemas with option keys, restoring correct scoring computation."*
+
+### Scenario C: WebSocket Type Safety & ClassCastException
+- **The Issue**: During live multiplayer quiz lobbies, the server connection randomly dropped for some players, throwing `ClassCastException` in the console.
+- **The Cause**: In `LobbyWebSocketController`, client payloads were parsed by directly casting values: `((Number) payload.get("userId")).longValue()`. If the user ID was serialized as a string from the client, the JVM threw a `ClassCastException` and abruptly terminated the socket session.
+- **The Fix**: Refactored payload parsing by writing helper methods (`getLongValue` and `getIntegerValue`) that inspect the object type and dynamically parse strings if necessary, preventing class-cast failures.
+- **🗣️ How to explain**:
+  > *"In our WebSocket lobby server, we encountered random connection drops due to ClassCastExceptions when parsing incoming Stomp payloads. Clients occasionally serialized user IDs as strings instead of numbers. I refactored the payload parsing logic to use type-safe utility functions that validate payload types and dynamically parse strings, increasing real-time lobby stability."*

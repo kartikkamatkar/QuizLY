@@ -110,7 +110,7 @@ public class AiAssistantController {
             throw new SecurityException("Unauthorized: Access denied to user recommendations (BOLA)");
         }
         try {
-            Map<String, Object> results = analyticsService.getWeakTopicsAndRecommendations(userId);
+            Map<String, Object> results = analyticsService.getWeakTopicsAndRecommendations(userId, xUserId, xUserRole);
             return ResponseEntity.ok(results);
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Failed to compute recommendations: " + e.getMessage());

@@ -141,7 +141,7 @@ public class QuizService {
     }
 
     // CORRECTED submitQuiz method
-    public SubmitQuizResponse submitQuiz(SubmitQuizRequest request) {
+    public SubmitQuizResponse submitQuiz(SubmitQuizRequest request, String xUserId) {
         // First, get all questions for this quiz
         List<Question> questions = questionRepository.findByQuizId(request.getQuizId());
 
@@ -170,9 +170,10 @@ public class QuizService {
 
             System.out.println("=== BEFORE CALL ===");
 
-            Object response = attemptClient.saveAttempt(attempt);
+            Object response = attemptClient.saveAttempt(attempt, xUserId);
 
             System.out.println("=== AFTER CALL ===");
+
             System.out.println(response);
 
         } catch (Exception e) {

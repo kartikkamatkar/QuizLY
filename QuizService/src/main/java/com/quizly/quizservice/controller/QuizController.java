@@ -149,6 +149,6 @@ public class QuizController {
             throw new SecurityException("Unauthorized: Missing user identification header");
         }
 
-        return quizService.submitQuiz(request);
+        return quizService.submitQuiz(request, xUserId);
     }
 }

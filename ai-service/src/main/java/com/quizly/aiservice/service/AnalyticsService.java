@@ -23,8 +23,8 @@ public class AnalyticsService {
         this.chatModel = chatModel;
     }
 
-    public Map<String, Object> getWeakTopicsAndRecommendations(Long userId) {
-        List<Map<String, Object>> attempts = attemptServiceClient.getAttemptsByUserId(userId);
+    public Map<String, Object> getWeakTopicsAndRecommendations(Long userId, String xUserId, String xUserRole) {
+        List<Map<String, Object>> attempts = attemptServiceClient.getAttemptsByUserId(userId, xUserId, xUserRole);
 
         if (attempts.isEmpty()) {
             return Map.of(

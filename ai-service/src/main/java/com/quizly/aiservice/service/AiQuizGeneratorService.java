@@ -37,7 +37,7 @@ public class AiQuizGeneratorService {
                 - optionB (second option)
                 - optionC (third option)
                 - optionD (fourth option)
-                - correctAnswer (MUST match the EXACT value of one of the options)
+                - correctAnswer (MUST be either optionA, optionB, optionC, or optionD)
                 - topic (topic name)
                 
                 Do not include markdown tags like ```json in the output. Just return raw JSON.
@@ -86,7 +86,7 @@ public class AiQuizGeneratorService {
                 - optionB (second option)
                 - optionC (third option)
                 - optionD (fourth option)
-                - correctAnswer (MUST match the EXACT value of one of the options)
+                - correctAnswer (MUST be either optionA, optionB, optionC, or optionD)
                 - topic (topic name)
                 
                 Do not include markdown tags like ```json in the output. Just return raw JSON.

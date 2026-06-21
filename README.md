@@ -150,7 +150,24 @@ Open `http://localhost:5173` in your browser. All API requests are automatically
 
 ---
 
+## 🔧 Recent Improvements & Troubleshooting
+
+To make QuizLY more robust, secure, and fully aligned with production microservice standards, the following enhancements were resolved:
+
+1. **Declarative Feign Security Context Propagation**:
+   - *Problem*: Downstream microservices (like `attempt-service`) implement strict Broken Object Level Authorization (BOLA) security checks, validating `X-User-Id` request headers against payload user IDs. Since OpenFeign clients in `ai-service` and `QuizService` were making calls without propagating these headers, requests triggered fallback triggers (returning empty lists or failing to save attempts).
+   - *Solution*: Modified Feign Client interfaces (`AttemptServiceClient`, `AttemptClient`) to accept `@RequestHeader("X-User-Id")` parameters, passing authorization context downstream dynamically.
+2. **AI Quiz Generation Format Alignment**:
+   - *Problem*: The AI Quiz Generator prompts and static fallbacks in `ai-service` generated quiz objects where the `correctAnswer` key held the raw answer text (e.g. `"Centralized configuration management"`). Standard admin-generated quizzes store `correctAnswer` as option keys (`"optionA"`, `"optionB"`, etc.). Mismatched formats caused client score evaluations to fail and return `0`.
+   - *Solution*: Rewrote the LLM prompt instructions and the mock JSON fallback configurations in `FallbackAiConfig` to guarantee output of option keys (`optionA`/`optionB`/`optionC`/`optionD`) for `correctAnswer`.
+3. **Robust WebSocket Payload Parsing**:
+   - *Problem*: In `LobbyWebSocketController`, incoming payloads from Stomp frames were directly cast via `((Number) payload.get("userId")).longValue()`, causing `ClassCastException` failures if parameters were sent as strings.
+   - *Solution*: Implemented robust utility parsing methods (`getLongValue` and `getIntegerValue`) validating object types before casting, preventing socket connection drops.
+
+---
+
 ## 🎨 UI & Backend Connections
+
 
 - **Authentication**: Login/Register requests hit `http://localhost:6063/auth/login` and `http://localhost:6063/auth/register`. A successful login returns a JWT token stored in `localStorage`, which is dynamically injected as an `Authorization: Bearer <token>` header in all subsequent API calls via Axios interceptors.
 - **AI Hub**: The interface routes requests to `/api/ai/**`, which is mapped to the AI Service through the Gateway. Here, users can ask questions to the RAG chat engine, upload a study PDF, evaluate the difficulty of questions, and get automated study guides based on their microservice progress history.

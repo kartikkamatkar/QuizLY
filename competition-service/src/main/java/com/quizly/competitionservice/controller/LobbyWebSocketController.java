@@ -36,7 +36,7 @@ public class LobbyWebSocketController {
     public void joinRoom(@DestinationVariable String roomCode, @Payload Map<String, Object> payload) {
         String code = roomCode.toUpperCase();
         String userName = (String) payload.get("userName");
-        Long userId = ((Number) payload.get("userId")).longValue();
+        Long userId = getLongValue(payload.get("userId"));
 
         Optional<Participant> partOpt = participantRepository.findByRoomCodeAndUserId(code, userId);
         if (partOpt.isEmpty()) {
@@ -62,7 +62,7 @@ public class LobbyWebSocketController {
     @MessageMapping("/room/{roomCode}/start")
     public void startRoom(@DestinationVariable String roomCode, @Payload Map<String, Object> payload) {
         String code = roomCode.toUpperCase();
-        Long hostUserId = ((Number) payload.get("hostUserId")).longValue();
+        Long hostUserId = getLongValue(payload.get("hostUserId"));
 
         Optional<Competition> compOpt = competitionRepository.findByRoomCode(code);
         if (compOpt.isPresent()) {
@@ -83,8 +83,8 @@ public class LobbyWebSocketController {
     @MessageMapping("/room/{roomCode}/score")
     public void updateScore(@DestinationVariable String roomCode, @Payload Map<String, Object> payload) {
         String code = roomCode.toUpperCase();
-        Long userId = ((Number) payload.get("userId")).longValue();
-        Integer score = (Integer) payload.get("score");
+        Long userId = getLongValue(payload.get("userId"));
+        Integer score = getIntegerValue(payload.get("score"));
 
         Optional<Participant> partOpt = participantRepository.findByRoomCodeAndUserId(code, userId);
         if (partOpt.isPresent()) {
@@ -113,5 +113,33 @@ public class LobbyWebSocketController {
                 "participants", participants
             ));
         }
+    }
+
+    private Long getLongValue(Object value) {
+        if (value == null) return null;
+        if (value instanceof Number) {
+            return ((Number) value).longValue();
+        } else if (value instanceof String) {
+            try {
+                return Long.valueOf((String) value);
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
+        return null;
+    }
+
+    private Integer getIntegerValue(Object value) {
+        if (value == null) return null;
+        if (value instanceof Number) {
+            return ((Number) value).intValue();
+        } else if (value instanceof String) {
+            try {
+                return Integer.valueOf((String) value);
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
+        return null;
     }
 }

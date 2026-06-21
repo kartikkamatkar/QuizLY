@@ -13,7 +13,7 @@ public class AttemptServiceClientFallback implements AttemptServiceClient {
     private static final Logger log = LoggerFactory.getLogger(AttemptServiceClientFallback.class);
 
     @Override
-    public List<Map<String, Object>> getAttemptsByUserId(Long userId) {
+    public List<Map<String, Object>> getAttemptsByUserId(Long userId, String xUserId, String xUserRole) {
         log.error("Attempt Service is down! Fallback returning empty list for user ID: {}", userId);
         return List.of();
     }
