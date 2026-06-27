@@ -184,5 +184,5 @@ QuizLY comes packaged with complete DevOps configurations and observability setu
 - **Monitoring & Metrics**: Prometheus scraping configurations and preconfigured Grafana metrics dashboards.
 - **Kubernetes Deployment manifests**: Complete declarations (`secrets`, `configmaps`, `ingress`, databases, and stateless microservice Deployments) optimized with liveness/readiness probes.
 
-For detailed information on the layout, configuration details, and running of the DevOps stack, refer to the [DevOps and Observability Guide](file:///d:/Project/QuizLY/devops/README.md)...
+For detailed information on the layout, configuration details, and running of the DevOps stack, refer to the [DevOps and Observability Guide](file:///d:/Project/QuizLY/devops/README.md)....
 
