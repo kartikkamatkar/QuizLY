@@ -97,7 +97,7 @@ const AdminPanel = () => {
       setQuizPdfUrl('');
       fetchQuizzes();
     } catch (err) {
-      setError(err.response?.data || 'Failed to create quiz.');
+      setError(typeof err.response?.data === 'string' ? err.response.data : (err.response?.data?.message || err.response?.data?.error || 'Failed to create quiz.'));
     } finally {
       setLoading(false);
     }
@@ -159,7 +159,7 @@ const AdminPanel = () => {
       setSelectedQuestionId('');
       fetchQuizzes(); // Refresh quiz stats (question counts)
     } catch (err) {
-      setError(err.response?.data || 'Failed to link question to quiz.');
+      setError(typeof err.response?.data === 'string' ? err.response.data : (err.response?.data?.message || err.response?.data?.error || 'Failed to link question to quiz.'));
     } finally {
       setLoading(false);
     }

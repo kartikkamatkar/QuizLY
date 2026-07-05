@@ -79,6 +79,7 @@ public class QuizMapper {
         response.setTopic(question.getTopic());
         response.setCategory(question.getCategory());
         response.setDifficulty(question.getDifficulty());
+        response.setCorrectAnswer(question.getCorrectAnswer());
 
         return response;
     }

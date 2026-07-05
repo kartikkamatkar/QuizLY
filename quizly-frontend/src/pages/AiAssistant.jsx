@@ -9,7 +9,10 @@ import {
 import api from '../api/axios';
 
 const AiAssistant = () => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const userData = localStorage.getItem('user');
+    return userData ? JSON.parse(userData) : null;
+  });
   const [activeTab, setActiveTab] = useState('generator'); // generator, coach, chatbot
 
   // Quiz Generator States
@@ -52,10 +55,7 @@ const AiAssistant = () => {
   const categories = ['JAVA', 'SPRING', 'REACT', 'DSA', 'DBMS', 'OS', 'CN', 'APTITUDE'];
 
   useEffect(() => {
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      setUser(JSON.parse(userData));
-    }
+    // Loaded user synchronously, no-op here
   }, []);
 
   useEffect(() => {
@@ -118,7 +118,7 @@ const AiAssistant = () => {
       setGeneratedQuiz(response.data);
     } catch (err) {
       console.error(err);
-      setError(err.response?.data || 'Failed to generate quiz. Please try again.');
+      setError(typeof err.response?.data === 'string' ? err.response.data : (err.response?.data?.message || err.response?.data?.error || 'Failed to generate quiz. Please try again.'));
     } finally {
       setGenerating(false);
     }
@@ -155,7 +155,7 @@ const AiAssistant = () => {
       setGeneratedQuiz(response.data);
     } catch (err) {
       console.error(err);
-      setError(err.response?.data || 'Failed to generate quiz from PDF. Please check backend config.');
+      setError(typeof err.response?.data === 'string' ? err.response.data : (err.response?.data?.message || err.response?.data?.error || 'Failed to generate quiz from PDF. Please check backend config.'));
     } finally {
       setGenerating(false);
     }

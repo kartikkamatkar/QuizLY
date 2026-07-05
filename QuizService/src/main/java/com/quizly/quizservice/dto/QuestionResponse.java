@@ -14,6 +14,7 @@ public class QuestionResponse {
     private String topic;
     private Category category;
     private Difficulty difficulty;
+    private String correctAnswer;
 
     public Long getId() {
         return id;
@@ -85,5 +86,13 @@ public class QuestionResponse {
 
     public void setDifficulty(Difficulty difficulty) {
         this.difficulty = difficulty;
+    }
+
+    public String getCorrectAnswer() {
+        return correctAnswer;
+    }
+
+    public void setCorrectAnswer(String correctAnswer) {
+        this.correctAnswer = correctAnswer;
     }
 }

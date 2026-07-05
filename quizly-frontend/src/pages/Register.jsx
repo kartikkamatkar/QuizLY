@@ -50,7 +50,7 @@ const Register = () => {
       }, 1500);
     } catch (err) {
       console.error(err);
-      setError(err.response?.data || 'Email already exists or server error.');
+      setError(typeof err.response?.data === 'string' ? err.response.data : (err.response?.data?.message || err.response?.data?.error || 'Email already exists or server error.'));
     } finally {
       setLoading(false);
     }
@@ -105,7 +105,8 @@ const Register = () => {
         otp: otpCode
       });
 
-      const token = otpResponse.data;
+      const tokenData = otpResponse.data;
+      const token = tokenData && tokenData.accessToken ? tokenData.accessToken : tokenData;
       if (token === 'Invalid OTP' || token === 'OTP Expired' || token === 'User Data Expired') {
         setError(token);
         setLoading(false);
@@ -130,7 +131,7 @@ const Register = () => {
 
     } catch (err) {
       console.error(err);
-      setError(err.response?.data || 'Verification failed. Try again.');
+      setError(typeof err.response?.data === 'string' ? err.response.data : (err.response?.data?.message || err.response?.data?.error || 'Verification failed. Try again.'));
     } finally {
       setLoading(false);
     }

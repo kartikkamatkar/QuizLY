@@ -7,7 +7,10 @@ import AdminPanel from '../component/AdminPanel';
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const userData = localStorage.getItem('user');
+    return userData ? JSON.parse(userData) : null;
+  });
   const [attempts, setAttempts] = useState([]);
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -31,11 +34,8 @@ const Dashboard = () => {
 
   useEffect(() => {
     // Load user profile
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      const parsedUser = JSON.parse(userData);
-      setUser(parsedUser);
-      fetchDashboardData(parsedUser.id);
+    if (user) {
+      fetchDashboardData(user.id);
     } else {
       setLoading(false);
     }
@@ -96,7 +96,7 @@ const Dashboard = () => {
       const comp = response.data;
       navigate(`/lobby/${comp.roomCode}`);
     } catch (err) {
-      alert(err.response?.data || 'Failed to create lobby room.');
+      alert(typeof err.response?.data === 'string' ? err.response.data : (err.response?.data?.message || err.response?.data?.error || 'Failed to create lobby room.'));
     } finally {
       setLobbyLoading(false);
     }

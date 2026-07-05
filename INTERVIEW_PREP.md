@@ -436,4 +436,10 @@ The following registry documents the bugs identified and resolved in the QuizLY 
 - **Cause**: The initialization scripts used `opsForZSet().incrementScore()`.
 - **Fix**: Replaced with `opsForZSet().add()` to overwrite rankings instead of incrementing them.
 
+### 5. React Children Rendering Crash (Objects as React Child)
+- **Vulnerability**: When the authentication API returned validation JSON errors (like `{ "error": "Invalid OTP" }`), setting `error` to the object caused the React client to crash with `Objects are not valid as a React child` when rendering.
+- **Cause**: The React catch blocks directly passed the raw `err.response?.data` object to `setError`.
+- **Fix**: Replaced raw payload assignment with a safe type-checking evaluation: `typeof err.response?.data === 'string' ? err.response.data : (err.response?.data?.message || err.response?.data?.error || 'Default Message')`.
+
 ---
+

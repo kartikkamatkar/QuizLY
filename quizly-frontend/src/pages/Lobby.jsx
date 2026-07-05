@@ -7,7 +7,10 @@ import api from '../api/axios';
 const Lobby = () => {
   const { roomCode } = useParams();
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const userData = localStorage.getItem('user');
+    return userData ? JSON.parse(userData) : null;
+  });
 
   // Lobby States
   const [competition, setCompetition] = useState(null);
@@ -37,11 +40,8 @@ const Lobby = () => {
   }, [competition]);
 
   useEffect(() => {
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      const parsedUser = JSON.parse(userData);
-      setUser(parsedUser);
-      initializeLobby(parsedUser);
+    if (user) {
+      initializeLobby(user);
     } else {
       setError('You must be signed in to join a competition.');
       setLoading(false);
@@ -154,7 +154,7 @@ const Lobby = () => {
       setLoading(false);
     } catch (err) {
       console.error(err);
-      setError(err.response?.data || 'Failed to initialize competition lobby.');
+      setError(typeof err.response?.data === 'string' ? err.response.data : (err.response?.data?.message || err.response?.data?.error || 'Failed to initialize competition lobby.'));
       setLoading(false);
     }
   };
@@ -250,7 +250,7 @@ const Lobby = () => {
       await api.post(`/api/competitions/${roomCode}/start?userId=${user.id}`);
       fetchLobbyData();
     } catch (err) {
-      alert(err.response?.data || 'Failed to start competition.');
+      alert(typeof err.response?.data === 'string' ? err.response.data : (err.response?.data?.message || err.response?.data?.error || 'Failed to start competition.'));
     }
   };
 

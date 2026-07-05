@@ -150,7 +150,10 @@ services:
       - "6065:6065"
     environment:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
-      SPRING_AI_OPENAI_API_KEY: mock-key-12345
+      SPRING_AI_OPENAI_API_KEY: da2aad15e08443d090ab371fa8a0682d.SDnNUzfLjwd8qIsd0od3nkoA
+      SPRING_AI_OPENAI_BASE_URL: http://host.docker.internal:11435
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - quizly-network
     depends_on:

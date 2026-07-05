@@ -43,8 +43,8 @@ graph TD
     
     %% AI Stack
     AIService --> SpringAI["Spring AI Framework"]
-    SpringAI --> OpenAI[OpenAI / Gemini LLMs]
-    SpringAI --> QdrantDB[(Qdrant Vector DB: RAG Context)]
+    SpringAI --> Ollama["Local Ollama (llama3 & nomic-embed-text)"]
+    SpringAI --> SimpleVectorStore["SimpleVectorStore (In-Memory RAG Context)"]
     
     %% Observability Stack
     Services[All Microservices] --> Prometheus["Prometheus (Metrics: Port 9090)"]
@@ -91,7 +91,7 @@ This matrix highlights the design decisions implemented in QuizLY, explaining th
 | **Apache Kafka** | Distributed Event Queue | Decouples services asynchronously. When a quiz is created or completed, Kafka events are emitted to coordinate messaging, study plans, and notifications without locking application threads. |
 | **Redis (Sorted Sets)** | In-Memory Data Store | Stores real-time leaderboards. By using Redis **ZSets** (`ZADD` / `ZREVRANGE`), the system retrieves high-score leaders in `O(log(N))` time complexity instead of hitting disk-bound PostgreSQL databases. |
 | **WebSockets (STOMP)** | Real-Time Protocol | Powering the Competition Service arena. Clients subscribe to STOMP topic channels (`/topic/competition/{roomCode}`) for immediate notification of score updates and opponent statuses during tournaments. |
-| **Spring AI & Qdrant** | AI & Vector Database | Implements the **RAG (Retrieval-Augmented Generation)** pattern. Uploaded study PDFs are parsed, converted into vector embeddings, and indexed in Qdrant. The AI Service performs similarity searches during chatbot queries to provide verified reference responses. |
+| **Spring AI & Ollama** | AI & Vector Database | Implements the **RAG (Retrieval-Augmented Generation)** pattern. We use the Spring AI OpenAI compatibility layer configured to query a local **Ollama** service. Chat queries are handled by `llama3`, and document embeddings are generated using `nomic-embed-text` with an in-memory `SimpleVectorStore`. |
 | **Zipkin & Micrometer** | Distributed Tracing | Adds diagnostic observability. By injecting transaction IDs into request header bags, we can trace a single API call's network travel downstream across multiple databases and microservices. |
 | **Loki, ELK, Prometheus** | Observability Triad | Loki/Elasticsearch aggregates stdout streams, Prometheus scrapes Actuator JVM metrics, and Grafana aggregates these into graphical status monitoring panels. |
 
@@ -163,6 +163,9 @@ To make QuizLY more robust, secure, and fully aligned with production microservi
 3. **Robust WebSocket Payload Parsing**:
    - *Problem*: In `LobbyWebSocketController`, incoming payloads from Stomp frames were directly cast via `((Number) payload.get("userId")).longValue()`, causing `ClassCastException` failures if parameters were sent as strings.
    - *Solution*: Implemented robust utility parsing methods (`getLongValue` and `getIntegerValue`) validating object types before casting, preventing socket connection drops.
+4. **Local Ollama AI Agent & RAG Integration**:
+   - *Problem*: The Retrieval-Augmented Generation (RAG) assistant was entirely mocked out by default, and connection attempts to external providers failed authentication.
+   - *Solution*: Configured `ai-service` to integrate with a local **Ollama** instance. We routed requests through a user-space port forwarder running on port `11435` of the host, allowing the containerized backend to communicate with the host-bound Ollama instance using `llama3` for chat and `nomic-embed-text` for document embeddings.
 
 ---
 
