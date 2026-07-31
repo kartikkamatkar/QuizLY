@@ -117,7 +117,7 @@ QuizLY's Config Server is backed by a local Git repository. Navigate to `config-
 ```bash
 cd config-repo
 git init
-git add .
+git add . .
 git commit -m "Initialize configurations properties files"
 cd ..
 ```
