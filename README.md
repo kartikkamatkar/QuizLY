@@ -1,6 +1,6 @@
 # QuizLY 🧠 — Enterprise-Grade Distributed AI Quiz Platform
 
-QuizLY is a high-performance, resilient, microservice-based AI quiz platform built using Java 21, Spring Boot, Spring Cloud, Kafka, Redis, PostgreSQL, and Spring AI. It features service discovery, centralized configurations, distributed tracing, live WebSockets tournaments, vector-based RAG learning assistance, and automatic PDF-to-quiz synthesis.
+QuizLY is a high-performance, resilient, microservice-based AI quiz platform built using Java 21, Spring Boot, Spring Cloud, Kafka, Redis, PostgreSQL, and Spring AI. It features service discovery, centralized configurations, distributed tracing, live WebSockets tournaments, vector-based RAG learning assistance, and automatic PDF-to-quiz synthesis..
 
 ---
 
